@@ -1,5 +1,6 @@
 import LineAlert from 'components/LineAlert'
 import ProposalEditor from 'components/ProposalEditor'
+import ProposalSidebarList from 'components/ProposalSidebarList'
 import WalletLoader from 'components/WalletLoader'
 import { useSigningClient } from 'contexts/cosmwasm'
 import type { NextPage } from 'next'
@@ -65,13 +66,16 @@ const ProposalCreate: NextPage = () => {
       <LineAlert className="mt-2" variant="success" msg="Proposal Saved" />
     </div>
   ) : (
-    <ProposalEditor
-      onProposal={handleProposal}
-      error={error}
-      loading={loading}
-      contractAddress={contractAddress}
-      recipientAddress={walletAddress}
-    />
+    <div className="flex w-full">
+      <ProposalSidebarList contractAddress={contractAddress} className="flex-col w-64 p-8"/>
+      <ProposalEditor
+        onProposal={handleProposal}
+        error={error}
+        loading={loading}
+        contractAddress={contractAddress}
+        recipientAddress={walletAddress}
+      />
+    </div>
   )
 
   return (
