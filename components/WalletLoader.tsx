@@ -1,8 +1,18 @@
-import { ReactNode } from 'react'
+import { ReactNode, useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { useSigningClient } from 'contexts/cosmwasm'
 import { isKeplrInstalled } from 'services/keplr'
 import Loader from './Loader'
+
+const installKeplrComponent = (
+  <p className="mt-8 text-xl">
+    Get started by installing{' '}
+    <a className="link link-primary link-hover" href="https://keplr.app/">
+      Keplr wallet
+    </a>
+    , then reload this page.
+  </p>
+)
 
 function WalletLoader({
   children,
@@ -18,6 +28,15 @@ function WalletLoader({
     connectWallet,
   } = useSigningClient()
 
+  const [hasKeplr, setHasKeplr] = useState(false)
+
+  useEffect(() => {
+    // Have to check for keplr on the client, so do it
+    // in an effect so we don't get conflicts with
+    // nextjs server-side rendering
+    setHasKeplr(isKeplrInstalled())
+  }, [])
+
   if (loading || clientLoading) {
     return (
       <div className="flex justify-center">
@@ -27,34 +46,26 @@ function WalletLoader({
   }
 
   if (walletAddress === '') {
-    const hasKeplr = isKeplrInstalled()
-    let keplrLink
-    if (hasKeplr) {
-      keplrLink = (
-        <>
-          <p>DAODAO is a Decentralized App (&quot;dApp&quot;).</p>
-          <p>
-            Please connect your{' '}
-            <a
-              className="link link-primary link-hover"
-              href="https://keplr.app/"
-            >
-              Keplr wallet
-            </a>
-          </p>
-        </>
-      )
-    } else {
-      keplrLink = (
-        <p className="mt-8 text-xl">
-          Get started by installing{' '}
+    const keplrLinkComponent = hasKeplr ? (
+      <>
+        <p>DAODAO is a Decentralized App (&quot;dApp&quot;).</p>
+        <p>
+          Please connect your{' '}
           <a className="link link-primary link-hover" href="https://keplr.app/">
             Keplr wallet
           </a>
-          , then reload this page.
         </p>
-      )
-    }
+      </>
+    ) : (
+      <p className="mt-8 text-xl">
+        Get started by installing{' '}
+        <a className="link link-primary link-hover" href="https://keplr.app/">
+          Keplr wallet
+        </a>
+        , then reload this page.
+      </p>
+    )
+
     const connectButton = hasKeplr ? (
       <button
         className="p-6 mt-6 text-left border border-secondary hover:border-primary rounded-xl hover:text-primary focus:text-primary-focus"
@@ -85,7 +96,7 @@ function WalletLoader({
                 {process.env.NEXT_PUBLIC_SITE_DESCRIPTION}
               </h3>
             )}
-            {keplrLink}
+            {keplrLinkComponent}
             <div className="modal-action">{connectButton}</div>
           </div>
         </div>
