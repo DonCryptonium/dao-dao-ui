@@ -12,13 +12,13 @@ import { defaultExecuteFee } from 'util/fee'
 
 const ProposalCreate: NextPage = () => {
   const router = useRouter()
-  const contractAddress = router.query.contractAddress as string
-
   const { walletAddress, signingClient } = useSigningClient()
   const [transactionHash, setTransactionHash] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const [proposalID, setProposalID] = useState('')
+
+  const contractAddress = router.query.contractAddress as string
 
   const handleProposal = async (proposal: Proposal) => {
     setLoading(true)
@@ -79,9 +79,7 @@ const ProposalCreate: NextPage = () => {
   )
 
   return (
-    <WalletLoader>
       <div className="flex flex-col w-full">{content}</div>
-    </WalletLoader>
   )
 }
 

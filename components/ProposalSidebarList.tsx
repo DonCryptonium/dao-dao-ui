@@ -1,7 +1,7 @@
 import { useRecoilState, useRecoilValueLoadable } from 'recoil'
 import { proposalsState } from '../atoms/proposal-atoms'
 // import { signingClientState } from '../atoms/cosmos-atoms'
-import { cosmosSigningClient } from '../selectors/cosmos-selectors'
+import { cosmosQueryClient } from '../selectors/cosmos-selectors'
 
 export default function ProposalSidebarList({
   contractAddress,
@@ -11,7 +11,7 @@ export default function ProposalSidebarList({
   className: string
 }) {
   const [proposals, setProposals] = useRecoilState(proposalsState)
-  const signingClientValue = useRecoilValueLoadable(cosmosSigningClient)
+  const signingClientValue = useRecoilValueLoadable(cosmosQueryClient)
   const signingClient =
     signingClientValue.state === 'hasValue'
       ? signingClientValue.contents

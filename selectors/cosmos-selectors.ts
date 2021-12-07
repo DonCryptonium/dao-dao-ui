@@ -1,6 +1,6 @@
 import { selector } from "recoil";
 import { connectKeplr } from 'services/keplr'
-import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { CosmWasmClient, SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 
 const PUBLIC_RPC_ENDPOINT = process.env.NEXT_PUBLIC_CHAIN_RPC_ENDPOINT || ''
 const PUBLIC_CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
@@ -27,7 +27,16 @@ async function loadClient() {
   }
 }
 
+async function loadQueryClient() {
+  return CosmWasmClient.connect(PUBLIC_RPC_ENDPOINT)
+}
+
 export const cosmosSigningClient = selector({
   key: 'cosmosSigningClientKey',
   get: loadClient
+});
+
+export const cosmosQueryClient = selector({
+  key: 'cosmosQueryClientKey',
+  get: loadQueryClient
 });
