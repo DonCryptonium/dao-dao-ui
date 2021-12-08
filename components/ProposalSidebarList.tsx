@@ -1,7 +1,7 @@
 import { useRecoilState, useRecoilValueLoadable } from 'recoil'
 import { proposalsState } from '../atoms/proposal-atoms'
 // import { signingClientState } from '../atoms/cosmos-atoms'
-import { cosmosQueryClient } from '../selectors/cosmos-selectors'
+import { cosmosSigningClient, cosmosQueryClient } from '../selectors/cosmos-selectors'
 
 export default function ProposalSidebarList({
   contractAddress,
@@ -11,24 +11,24 @@ export default function ProposalSidebarList({
   className: string
 }) {
   const [proposals, setProposals] = useRecoilState(proposalsState)
-  const signingClientValue = useRecoilValueLoadable(cosmosQueryClient)
-  const signingClient =
-    signingClientValue.state === 'hasValue'
-      ? signingClientValue.contents
-      : undefined
-  if (signingClient !== undefined) {
-    const startBefore = 0
-    async function loadProposals() {
-      const response = await (signingClient as any).queryContractSmart(contractAddress, {
-        reverse_proposals: {
-          // ...(startBefore && { start_before: startBefore }),
-          limit: 10,
-        },
-      })
-      setProposals(response.proposals)
-    }
-    loadProposals()
-  }
+  // const signingClientValue = useRecoilValueLoadable(cosmosSigningClient)
+  // const signingClient =
+  //   signingClientValue.state === 'hasValue'
+  //     ? signingClientValue.contents
+  //     : undefined
+  // if (signingClient !== undefined) {
+  //   const startBefore = 0
+  //   async function loadProposals() {
+  //     const response = await (signingClient as any).queryContractSmart(contractAddress, {
+  //       reverse_proposals: {
+  //         // ...(startBefore && { start_before: startBefore }),
+  //         limit: 10,
+  //       },
+  //     })
+  //     setProposals(response.proposals)
+  //   }
+  //   loadProposals()
+  // }
   const proposalListItems = proposals.map((proposal) => (
     <li key={`proposal_${i++}`}>{(proposal as any).title}</li>
   ))
