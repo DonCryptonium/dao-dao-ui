@@ -1,4 +1,3 @@
-import Markdown from 'rich-markdown-editor'
 import VoteButtons from 'components/VoteButtons'
 import { useThemeContext } from 'contexts/theme'
 import { VoteInfo, ProposalResponse } from '@dao-dao/types/contracts/cw3-dao'
@@ -37,10 +36,10 @@ function ProposalDetails({
         <ProposalStatus status={proposal.status} />
       </div>
 
-      <Markdown
+      <textarea
         className="mb-8"
         readOnly={true}
-        dark={themeContext.theme === 'junoDark'}
+        // dark={themeContext.theme === 'junoDark'}
         value={proposal.description}
       />
 

@@ -1,10 +1,11 @@
-import React, { FunctionComponent, useEffect, useState } from 'react'
+import React, { FunctionComponent } from 'react'
+import { useRecoilValue } from 'recoil'
 import { ChevronRightIcon } from '@heroicons/react/solid'
-import WalletLoader from 'components/WalletLoader'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { DAO_CODE_ID } from 'util/constants'
-import { useDaosList, DaoListType } from 'hooks/dao'
+import { daos as daoList } from 'selectors/dao'
+import { DaoListType } from 'hooks/dao'
 
 const DaoListComponent: FunctionComponent<DaoListType> = ({
   address,
@@ -27,10 +28,9 @@ const DaoListComponent: FunctionComponent<DaoListType> = ({
 }
 
 const DaoList: NextPage = () => {
-  const { daos, loading } = useDaosList(DAO_CODE_ID)
-
+  const daos: DaoListType[] = useRecoilValue(daoList(DAO_CODE_ID)) as any
   return (
-    <WalletLoader loading={loading}>
+    <>
       <h1 className="text-6xl font-bold">DAOs</h1>
       {daos.length > 0 ? (
         daos.map((dao, key) => (
@@ -51,7 +51,7 @@ const DaoList: NextPage = () => {
           </Link>
         </>
       )}
-    </WalletLoader>
+    </>
   )
 }
 

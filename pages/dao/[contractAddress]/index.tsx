@@ -1,20 +1,19 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
-import WalletLoader from 'components/WalletLoader'
-import { useSigningClient } from 'contexts/cosmwasm'
-import { useDaoConfig } from 'hooks/dao'
+import { dao as daoItem } from 'selectors/dao'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import { useRecoilValue } from 'recoil'
 
 const DaoHome: NextPage = () => {
   const router = useRouter()
   const contractAddress = router.query.contractAddress as string
 
-  let dao = useDaoConfig(contractAddress)
+  const dao = useRecoilValue(daoItem(contractAddress)) as any
 
   return (
-    <WalletLoader loading={dao.loading}>
+    <>
       {dao ? (
         <>
           <h1 className="text-6xl font-bold">{dao.name}</h1>
@@ -47,7 +46,7 @@ const DaoHome: NextPage = () => {
       ) : (
         <p>DAO not found</p>
       )}
-    </WalletLoader>
+    </>
   )
 }
 

@@ -12,9 +12,9 @@ import {
   messageForProposal,
   proposalMessages,
 } from 'models/proposal/proposalSelectors'
-import { useReducer, useState } from 'react'
+import { ChangeEvent, useReducer, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import Editor from 'rich-markdown-editor'
+// import Editor from 'rich-markdown-editor'
 import { isValidAddress } from 'util/isValidAddress'
 import {
   labelForMessage,
@@ -298,6 +298,10 @@ export default function ProposalEditor({
     setProposalDescription(description)
   }
 
+  function handleDescriptionTextChange(e: ChangeEvent<HTMLTextAreaElement>) {
+    setDescription(e.target.value)
+  }
+
   // TODO preview mode for the whole proposal
   if (editProposalJson) {
     return (
@@ -340,12 +344,14 @@ export default function ProposalEditor({
                 label="Description"
                 toolTip="Your proposal description"
               />
-              <Editor
+              <textarea
                 className={editorClassName}
-                onChange={handleDescriptionChange}
+                // onChange={handleDescriptionChange}
+                onChange={handleDescriptionTextChange}
                 defaultValue={proposal.description}
                 readOnly={complete}
-                dark={themeContext.theme === 'junoDark'}
+                // dark={themeContext.theme === 'junoDark'}
+                onBlur={handleDescriptionBlur}
                 id="description"
               />
               <label htmlFor="message-list" className="block mt-4 text-xl">

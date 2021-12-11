@@ -1,14 +1,14 @@
-import WalletLoader from 'components/WalletLoader'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
 import LineAlert from 'components/LineAlert'
-import { useProposal } from 'hooks/proposals'
+import { proposal as proposalItem } from 'selectors/proposal'
+import { useRecoilValue } from 'recoil'
 import ProposalDetails from 'components/ProposalDetails'
 
 const Proposal: NextPage = () => {
   let router = useRouter()
-  let { contractAddress } = router.query
+  const contractAddress = router.query.contractAddress as string
 
   const proposalId = router.query.proposalId as string
 
@@ -22,7 +22,7 @@ const Proposal: NextPage = () => {
     vote,
     execute,
     close,
-  } = useProposal(contractAddress as string, proposalId)
+  } = useRecoilValue(proposalItem({ contractAddress, proposalId }))
 
   const initialMessage: string | undefined = router.query.initialMessage as any
   const initialMessageStatus: 'success' | 'error' | undefined = router.query
@@ -34,7 +34,7 @@ const Proposal: NextPage = () => {
     ) : null
 
   return (
-    <WalletLoader loading={loading}>
+    <>
       <div className="flex flex-col w-full">
         <div className="grid bg-base-100 place-items-center">
           {initialMessageComponent}
@@ -80,7 +80,7 @@ const Proposal: NextPage = () => {
           )}
         </div>
       </div>
-    </WalletLoader>
+    </>
   )
 }
 

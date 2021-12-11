@@ -1,11 +1,10 @@
 import type { NextPage } from 'next'
 import { ChevronRightIcon } from '@heroicons/react/solid'
-import WalletLoader from 'components/WalletLoader'
 import Link from 'next/link'
 
 const Home: NextPage = () => {
   return (
-    <WalletLoader>
+    <>
       <h1 className="text-6xl font-bold">InterChain DAO Tooling</h1>
 
       <div className="mt-3 text-2xl">Choose your adventure...</div>
@@ -34,7 +33,7 @@ const Home: NextPage = () => {
           </a>
         </Link>
       </div>
-    </WalletLoader>
+    </>
   )
 }
 
