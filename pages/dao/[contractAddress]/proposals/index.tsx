@@ -10,8 +10,9 @@ const DaoProposals: NextPage = () => {
   // const { proposals, hideLoadMore, loading, setStartBefore } =
   //   useProposals(contractAddress)
 
-  const proposals = useRecoilValue(proposalList(contractAddress))
-  const hideLoadMore = false;
+  const startBefore = 0;
+  const proposals = useRecoilValue(proposalList({contractAddress, startBefore}))
+  const hideLoadMore = true;
   const setStartBefore = (arg: number) => {};
 
   return (

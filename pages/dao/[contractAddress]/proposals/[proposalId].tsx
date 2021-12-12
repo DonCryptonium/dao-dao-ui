@@ -12,17 +12,28 @@ const Proposal: NextPage = () => {
 
   const proposalId = router.query.proposalId as string
 
-  const {
-    walletAddress,
-    loading,
-    error,
-    proposal,
-    votes,
-    transactionHash,
-    vote,
-    execute,
-    close,
-  } = useRecoilValue(proposalItem({ contractAddress, proposalId }))
+  const proposalInfo = useRecoilValue(proposalItem({ contractAddress, proposalId }))
+
+  const walletAddress = '';
+  const transactionHash = '';
+  const votes: any[] = [];
+  const vote = () => {};
+  const execute = '';
+  const error = undefined;
+
+  // const {
+  //   walletAddress,
+  //   loading,
+  //   error,
+  //   // proposal,
+  //   votes,
+  //   transactionHash,
+  //   vote,
+  //   execute,
+  //   close,
+  // } = proposalInfo
+
+  const proposal = proposalInfo
 
   const initialMessage: string | undefined = router.query.initialMessage as any
   const initialMessageStatus: 'success' | 'error' | undefined = router.query

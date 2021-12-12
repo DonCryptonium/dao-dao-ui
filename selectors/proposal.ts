@@ -4,12 +4,10 @@ import { cosmWasmClient } from 'selectors/cosm'
 export const proposals = selectorFamily({
   key: 'ProposalList',
   get:
-    (contractAddress: string) =>
+    ({contractAddress, startBefore}: {contractAddress: string, startBefore: number}) =>
     async ({ get }) => {
-      debugger
-      const startBefore: number = 0
       const client = get(cosmWasmClient)
-      const { proposals: contracts } = await client?.queryContractSmart(
+      const { proposals } = await client?.queryContractSmart(
         contractAddress,
         {
           reverse_proposals: {
@@ -18,22 +16,7 @@ export const proposals = selectorFamily({
           },
         }
       )
-      const proposalList: any[] = []
-      if (contracts) {
-        for (let address of contracts) {
-          const proposalInfo = await client?.queryContractSmart(address, {
-            get_config: {},
-          })
-          if (proposalInfo?.config) {
-            const config = {
-              ...proposalInfo.config,
-              address,
-            }
-            proposalList.push(config)
-          }
-        }
-      }
-      return proposalList
+      return proposals
     },
 })
 
