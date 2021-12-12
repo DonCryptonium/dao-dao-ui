@@ -1,17 +1,34 @@
-import { selectorFamily } from 'recoil'
+import { selectorFamily, useRecoilState } from 'recoil'
 import { cosmWasmClient } from 'selectors/cosm'
-import { EmptyProposalState } from 'models/proposal/proposal'
+import {
+  DRAFT_SIGIL,
+  draftProposalMap,
+} from 'atoms/proposal'
+
+export function isDraftProposalId(proposalId: string): boolean {
+  if (!proposalId?.length) {
+    return true
+  }
+  return proposalId[0] === DRAFT_SIGIL
+}
+
+export const nextDraftProposalIdSelector = selectorFamily({
+  key: 'NextDraftProposalId',
+  get:  () => ({get}) => {
+    const map = get(draftProposalMap)
+    const nextNumericId = Object.values(map).length
+    const proposalId = `${DRAFT_SIGIL}_${nextNumericId}`
+    return proposalId
+  }
+})
 
 export const draftProposal = selectorFamily({
   key: 'ProposalDraft',
   get:
-    () =>
+    (proposalId: string) =>
     ({ get }) => {
-      return {
-        ...EmptyProposalState,
-        description: 'Draft Proposal',
-        id: -1,
-      }
+      const draftMap = get(draftProposalMap)
+      return draftMap[proposalId]
     },
 })
 
@@ -26,6 +43,7 @@ export const proposals = selectorFamily({
       startBefore: number
     }) =>
     async ({ get }) => {
+      const draftProposals = Object.values(get(draftProposalMap))
       const client = get(cosmWasmClient)
       const { proposals } = await client?.queryContractSmart(contractAddress, {
         reverse_proposals: {
@@ -34,13 +52,7 @@ export const proposals = selectorFamily({
         },
       })
       return [
-        {
-          ...EmptyProposalState,
-          status: 'Draft',
-          description: 'Draft Proposal',
-          title: 'Empty Proposal for Testing',
-          id: -1,
-        },
+        ...draftProposals,
         ...proposals,
       ]
     },
@@ -57,6 +69,9 @@ export const proposal = selectorFamily({
       proposalId: string
     }) =>
     async ({ get }) => {
+      if (isDraftProposalId(proposalId)) {
+        return get(draftProposal(proposalId))
+      }
       const client = get(cosmWasmClient)
       const proposalInfo = await client?.queryContractSmart(contractAddress, {
         proposal: { proposal_id: parseInt(proposalId || '0', 10) },

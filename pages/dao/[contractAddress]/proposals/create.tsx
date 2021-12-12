@@ -1,13 +1,19 @@
 import LineAlert from 'components/LineAlert'
 import ProposalEditor from 'components/ProposalEditor'
-import WalletLoader from 'components/WalletLoader'
 import { useSigningClient } from 'contexts/cosmwasm'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import { memoForProposal, Proposal } from 'models/proposal/proposal'
+import { memoForProposal, DraftProposal } from 'models/proposal/proposal'
 import { messageForProposal } from 'models/proposal/proposalSelectors'
 import { defaultExecuteFee } from 'util/fee'
+import { useRecoilValue, useRecoilState } from 'recoil'
+import {
+  isDraftProposalId,
+  nextDraftProposalIdSelector,
+} from 'selectors/proposal'
+import { draftProposalMap } from 'atoms/proposal'
+import Link from 'next/link'
 
 const ProposalCreate: NextPage = () => {
   const router = useRouter()
@@ -17,9 +23,17 @@ const ProposalCreate: NextPage = () => {
   const [transactionHash, setTransactionHash] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const [proposalID, setProposalID] = useState('')
+  const proposalId = useRecoilValue<string>(nextDraftProposalIdSelector(1))
+  const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
 
-  const handleProposal = async (proposal: Proposal) => {
+  const saveDraftProposal = (proposal: DraftProposal) => {
+    setProposalMap({
+      ...proposalMap,
+      [proposalId]: { ...proposal, id: proposalId },
+    })
+  }
+
+  const handleProposal = async (proposal: DraftProposal) => {
     setLoading(true)
     setError('')
     const propose = messageForProposal(proposal, contractAddress)
@@ -40,7 +54,6 @@ const ProposalCreate: NextPage = () => {
         const [{ value }] = wasm.attributes.filter(
           (w) => w.key === 'proposal_id'
         )
-        setProposalID(value)
         const initialMessage = `Saved Proposal "${proposal.title}"`
         const paramStr = `initialMessage=${initialMessage}&initialMessageStatus=success`
 
@@ -57,16 +70,17 @@ const ProposalCreate: NextPage = () => {
     }
   }
 
-  const content = proposalID ? (
+  const content = !isDraftProposalId(proposalId) ? (
     <div>
       <a
-        href={`/dao/${contractAddress}/proposals/${proposalID}`}
-      >{`${proposalID} saved`}</a>
+        href={`/dao/${contractAddress}/proposals/${proposalId}`}
+      >{`${proposalId} saved`}</a>
       <LineAlert className="mt-2" variant="success" msg="Proposal Saved" />
     </div>
   ) : (
     <ProposalEditor
       onProposal={handleProposal}
+      onSaveDraft={saveDraftProposal}
       error={error}
       loading={loading}
       contractAddress={contractAddress}
@@ -76,7 +90,10 @@ const ProposalCreate: NextPage = () => {
 
   return (
     <>
-      <div className="flex flex-col w-full">{content}</div>
+      <div className="flex flex-col w-full">
+        <Link href={`/dao/${contractAddress}/proposals`}>Proposals</Link>
+        {content}
+      </div>
     </>
   )
 }

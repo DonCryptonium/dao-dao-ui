@@ -1,5 +1,6 @@
 import ProposalCard from 'components/ProposalCard'
 import { ProposalResponse, Timestamp } from '@dao-dao/types/contracts/cw3-dao'
+import { isDraftProposalId } from 'selectors/proposal'
 
 type Expiration = {
   at_time: Timestamp
@@ -26,7 +27,15 @@ function ProposalList({
       {proposals &&
         proposals.map((proposal, idx) => {
           const { title, id, status } = proposal
-          const expires = proposal.expires as Expiration
+          let expires: Expiration
+          if (typeof id !== 'number') {
+            expires = {
+              at_time: '0' 
+            }
+          } else {
+            expires = proposal.expires as Expiration
+          }
+          
 
           return (
             <ProposalCard

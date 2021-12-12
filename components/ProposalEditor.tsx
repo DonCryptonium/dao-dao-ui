@@ -1,7 +1,7 @@
 import { CosmosMsgFor_Empty } from '@dao-dao/types/contracts/cw3-dao'
 import { useThemeContext } from 'contexts/theme'
 import { ProposalMessageType } from 'models/proposal/messageMap'
-import { EmptyProposal, Proposal } from 'models/proposal/proposal'
+import { EmptyProposal, DraftProposal } from 'models/proposal/proposal'
 import {
   ProposalAction,
   ProposalRemoveMessage,
@@ -37,13 +37,15 @@ export default function ProposalEditor({
   loading,
   error,
   onProposal,
+  onSaveDraft,
   contractAddress,
   recipientAddress,
 }: {
-  initialProposal?: Proposal
+  initialProposal?: DraftProposal
   loading?: boolean
   error?: string
-  onProposal: (proposal: Proposal) => void
+  onProposal: (proposal: DraftProposal) => void
+  onSaveDraft: (proposal: DraftProposal) => void
   contractAddress: string
   recipientAddress: string
 }) {
@@ -94,7 +96,7 @@ export default function ProposalEditor({
 
   const complete = false
 
-  function isProposalValid(proposalToCheck: Proposal): boolean {
+  function isProposalValid(proposalToCheck: DraftProposal): boolean {
     if (!proposalToCheck) {
       return false
     }
@@ -365,19 +367,36 @@ export default function ProposalEditor({
               <br />
 
               {!complete && (
-                <button
-                  className={`btn btn-primary text-lg mt-8 ml-auto ${
-                    loading ? 'loading' : ''
-                  }`}
-                  style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-                  type="submit"
-                  disabled={loading}
-                  onClick={(e) => {
-                    setProposalDescription(description)
-                  }}
-                >
-                  Create Proposal
-                </button>
+                <div>
+                  <button
+                    key="create"
+                    className={`btn btn-primary text-lg mt-8 ml-auto ${
+                      loading ? 'loading' : ''
+                    }`}
+                    style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+                    type="submit"
+                    disabled={loading}
+                    onClick={(e) => {
+                      setProposalDescription(description)
+                    }}
+                  >
+                    Create Proposal
+                  </button>
+                  <button
+                    key="draft"
+                    className={`btn btn-secondary text-lg mt-8 ml-auto ${
+                      loading ? 'loading' : ''
+                    }`}
+                    style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+                    type="submit"
+                    disabled={loading}
+                    onClick={(e) => {
+                      onSaveDraft(proposal)
+                    }}
+                  >
+                    Save Draft
+                  </button>
+                </div>
               )}
               {errorComponent}
             </form>

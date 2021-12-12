@@ -1,10 +1,10 @@
 import { MessageMapEntry, ProposalMessageType } from './messageMap'
-import { Proposal } from './proposal'
+import { DraftProposal } from './proposal'
 import { ProposalAction } from './proposalActions'
 import { proposalForMessage } from './proposalForMessage'
 import { getActiveMessageId, sortedMessages } from './proposalSelectors'
 
-function checkUpdated(updated: Proposal) {
+function checkUpdated(updated: DraftProposal) {
   if (
     updated?.activeMessageId &&
     !updated.messageMap[updated.activeMessageId]
@@ -16,9 +16,9 @@ function checkUpdated(updated: Proposal) {
   return updated
 }
 export function ProposalReducer(
-  state: Proposal,
+  state: DraftProposal,
   action: ProposalAction
-): Proposal {
+): DraftProposal {
   switch (action.type) {
     case 'setTitle':
       const updated = { ...state, title: action.title }
@@ -46,7 +46,7 @@ export function ProposalReducer(
           updatedActiveMessageId = newMessages[0].id
         }
       }
-      const updatedProposal: Proposal = {
+      const updatedProposal: DraftProposal = {
         ...state,
         messageMap,
         activeMessageId: updatedActiveMessageId ?? currentActiveMessageId,
@@ -128,7 +128,7 @@ export function ProposalReducer(
         ...oldEntry,
         message,
       }
-      const proposal: Proposal = {
+      const proposal: DraftProposal = {
         ...state,
         messageMap: {
           ...state.messageMap,

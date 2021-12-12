@@ -2,9 +2,10 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 
 import LineAlert from 'components/LineAlert'
-import { proposal as proposalItem } from 'selectors/proposal'
+import { isDraftProposalId, proposal as proposalItem } from 'selectors/proposal'
 import { useRecoilValue } from 'recoil'
 import ProposalDetails from 'components/ProposalDetails'
+import ProposalEditor from 'components/ProposalEditor'
 
 const Proposal: NextPage = () => {
   let router = useRouter()
@@ -46,6 +47,24 @@ const Proposal: NextPage = () => {
       <LineAlert msg={initialMessage} variant={initialMessageStatus} />
     ) : null
 
+  const detailsComponent = isDraftProposalId(proposalId) ? (
+    <ProposalEditor initialProposal={proposal} 
+      onProposal={p => {}}
+      onSaveDraft={p => {}}
+      recipientAddress=""
+      contractAddress={contractAddress}
+    />
+    ) : (
+    <ProposalDetails
+      proposal={proposal}
+      walletAddress={walletAddress}
+      votes={votes}
+      vote={vote}
+      execute={execute}
+      close={close}
+    />
+  )
+
   return (
     <>
       <div className="flex flex-col w-full">
@@ -68,14 +87,7 @@ const Proposal: NextPage = () => {
                 {'< Back'}
               </button>
 
-              <ProposalDetails
-                proposal={proposal}
-                walletAddress={walletAddress}
-                votes={votes}
-                vote={vote}
-                execute={execute}
-                close={close}
-              />
+              {detailsComponent}
 
               {error && (
                 <LineAlert className="mt-2" variant="error" msg={error} />

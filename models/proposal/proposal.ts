@@ -17,7 +17,7 @@ import { MessageMap } from './messageMap'
 
 export const MEMO_MAX_LEN = 255
 
-export interface Proposal {
+export interface DraftProposal {
   title: string
   description: string
   messageMap: MessageMap
@@ -29,7 +29,7 @@ export interface Proposal {
   }
 }
 
-export const EmptyProposal: Proposal = {
+export const EmptyProposal: DraftProposal = {
   title: '',
   description: '',
   nextId: 0,
@@ -68,7 +68,7 @@ export const EmptyProposalState: ProposalState = {
   votes: { ...EmptyVotes },
 }
 
-export function memoForProposal(proposal: Proposal): string {
+export function memoForProposal(proposal: DraftProposal): string {
   const messagesMemo = Object.values(proposal.messageMap)
     .map((msg) => labelForMessage(msg.message))
     .join(', ')
