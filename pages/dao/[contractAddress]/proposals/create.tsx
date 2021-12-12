@@ -75,9 +75,9 @@ const ProposalCreate: NextPage = () => {
   )
 
   return (
-    <WalletLoader>
+    <>
       <div className="flex flex-col w-full">{content}</div>
-    </WalletLoader>
+    </>
   )
 }
 

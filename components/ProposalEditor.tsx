@@ -250,22 +250,17 @@ export default function ProposalEditor({
   }
 
   const addMintMessage = () => {
-    const validAddress = !!(
-      recipientAddress && isValidAddress(recipientAddress)
-    )
-    if (validAddress) {
-      try {
-        const message = makeMintMessage('', recipientAddress)
-        const messageType = ProposalMessageType.Mint
-        const action: ProposalAction = {
-          type: 'addMessage',
-          message,
-          messageType,
-        }
-        dispatch(action)
-      } catch (e) {
-        console.error(e)
+    try {
+      const message = makeMintMessage('', recipientAddress)
+      const messageType = ProposalMessageType.Mint
+      const action: ProposalAction = {
+        type: 'addMessage',
+        message,
+        messageType,
       }
+      dispatch(action)
+    } catch (e) {
+      console.error(e)
     }
   }
 
@@ -318,6 +313,12 @@ export default function ProposalEditor({
     ? 'input input-error input-bordered rounded box-border py-3 px-8 h-full w-full focus:input-primary text-xl'
     : 'input input-bordered rounded box-border py-3 px-8 h-full w-full focus:input-primary text-xl'
 
+  const errorComponent = error ? (
+    <div className="mt-8">
+      <LineAlert variant="error" msg={error} />
+    </div>
+  ) : null
+
   return (
     <div className="flex flex-col w-full flex-row">
       <div className="grid bg-base-100">
@@ -359,8 +360,10 @@ export default function ProposalEditor({
               </label>
               <ul id="message-list">{messages}</ul>
               <br />
+
               <MessageSelector actions={messageActions}></MessageSelector>
               <br />
+
               {!complete && (
                 <button
                   className={`btn btn-primary text-lg mt-8 ml-auto ${
@@ -376,11 +379,7 @@ export default function ProposalEditor({
                   Create Proposal
                 </button>
               )}
-              {error && (
-                <div className="mt-8">
-                  <LineAlert variant="error" msg={error} />
-                </div>
-              )}
+              {errorComponent}
             </form>
           </div>
         </div>
