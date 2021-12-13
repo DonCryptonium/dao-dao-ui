@@ -14,28 +14,33 @@ import {
 
 import { labelForMessage } from '../../util/messagehelpers'
 import { MessageMap } from './messageMap'
+import { DRAFT_SIGIL } from 'atoms/proposal'
 
 export const MEMO_MAX_LEN = 255
 
 export interface DraftProposal {
+  id: string
   title: string
   description: string
   messageMap: MessageMap
   nextId: number
   // Which message is currently selected
   activeMessageId: string
+  status: string
   pendingMessages: {
     [key: string]: CosmosMsgFor_Empty | ExecuteMsg | DAOExecuteMsg
   }
 }
 
 export const EmptyProposal: DraftProposal = {
+  id: DRAFT_SIGIL,
   title: '',
   description: '',
   nextId: 0,
   messageMap: {},
   activeMessageId: '',
   pendingMessages: {},
+  status: 'draft'
 }
 
 const EmptyThreshold: Threshold = {

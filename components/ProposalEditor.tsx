@@ -1,36 +1,43 @@
 import { CosmosMsgFor_Empty } from '@dao-dao/types/contracts/cw3-dao'
+import { draftProposalMap } from 'atoms/proposal'
 import { useThemeContext } from 'contexts/theme'
 import { ProposalMessageType } from 'models/proposal/messageMap'
-import { EmptyProposal, DraftProposal } from 'models/proposal/proposal'
+import { DraftProposal, EmptyProposal, memoForProposal } from 'models/proposal/proposal'
 import {
   ProposalAction,
   ProposalRemoveMessage,
-  ProposalUpdateFromMessage,
+  ProposalUpdateFromMessage
 } from 'models/proposal/proposalActions'
 import { ProposalReducer } from 'models/proposal/proposalReducer'
 import {
   messageForProposal,
-  proposalMessages,
+  proposalMessages
 } from 'models/proposal/proposalSelectors'
 import { ChangeEvent, useReducer, useState } from 'react'
 import { useForm } from 'react-hook-form'
+import { useRecoilState, useRecoilValue } from 'recoil'
+import {
+  nextDraftProposalIdSelector
+} from 'selectors/proposal'
+import { defaultExecuteFee } from 'util/fee'
 // import Editor from 'rich-markdown-editor'
 import { isValidAddress } from 'util/isValidAddress'
 import {
   labelForMessage,
   makeMintMessage,
-  makeSpendMessage,
+  makeSpendMessage
 } from 'util/messagehelpers'
 import CustomEditor from './CustomEditor'
 import InputField, {
   InputFieldLabel,
-  makeFieldErrorMessage,
+  makeFieldErrorMessage
 } from './InputField'
 import LineAlert from './LineAlert'
 import MessageSelector from './MessageSelector'
 import MintEditor from './MintEditor'
 import RawEditor from './RawEditor'
 import SpendEditor from './SpendEditor'
+import { useRouter } from 'next/router'
 
 export default function ProposalEditor({
   initialProposal,
@@ -45,7 +52,7 @@ export default function ProposalEditor({
   loading?: boolean
   error?: string
   onProposal: (proposal: DraftProposal) => void
-  onSaveDraft: (proposal: DraftProposal) => void
+  onSaveDraft?: (proposal: DraftProposal) => void
   contractAddress: string
   recipientAddress: string
 }) {
@@ -62,6 +69,62 @@ export default function ProposalEditor({
     handleSubmit,
     formState: { errors },
   } = useForm()
+  const router = useRouter()
+  const nextProposalId = useRecoilValue<string>(nextDraftProposalIdSelector(1))
+  const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
+  const proposalId = initialProposal?.id || nextProposalId
+
+  const saveDraftProposal = (proposal: DraftProposal) => {
+    setProposalMap({
+      ...proposalMap,
+      [proposalId]: { ...proposal, id: proposalId },
+    })
+    router.push(`/dao/${contractAddress}/proposals`)
+  }
+
+  const deleteDraftProposal = () => {
+    const nextProposalMap = {...proposalMap}
+    delete nextProposalMap[proposalId]
+    setProposalMap(nextProposalMap)
+    router.push(`/dao/${contractAddress}/proposals`)
+  }
+
+  // const handleProposal = async (proposal: DraftProposal) => {
+  //   setLoading(true)
+  //   setError('')
+  //   const propose = messageForProposal(proposal, contractAddress)
+  //   const memo = memoForProposal(proposal)
+  //   try {
+  //     const response = await signingClient?.execute(
+  //       walletAddress,
+  //       contractAddress,
+  //       { propose },
+  //       defaultExecuteFee,
+  //       memo
+  //     )
+  //     setLoading(false)
+  //     if (response) {
+  //       setTransactionHash(response.transactionHash)
+  //       const [{ events }] = response.logs
+  //       const [wasm] = events.filter((e) => e.type === 'wasm')
+  //       const [{ value }] = wasm.attributes.filter(
+  //         (w) => w.key === 'proposal_id'
+  //       )
+  //       const initialMessage = `Saved Proposal "${proposal.title}"`
+  //       const paramStr = `initialMessage=${initialMessage}&initialMessageStatus=success`
+
+  //       router.push(`/dao/${contractAddress}/proposals/${value}?${paramStr}`)
+  //     }
+  //   } catch (e: any) {
+  //     console.error(
+  //       `Error submitting proposal ${JSON.stringify(proposal, undefined, 2)}`
+  //     )
+  //     console.dir(e)
+  //     console.error(e.message)
+  //     setLoading(false)
+  //     setError(e.message)
+  //   }
+  // }
 
   const messageActions = [
     {
@@ -339,6 +402,7 @@ export default function ProposalEditor({
                 readOnly={complete}
                 register={register}
                 fieldErrorMessage={fieldErrorMessage}
+                defaultValue={proposal.title}
                 onChange={(e) => setProposalTitle(e?.target?.value)}
               />
               <InputFieldLabel
@@ -388,13 +452,25 @@ export default function ProposalEditor({
                       loading ? 'loading' : ''
                     }`}
                     style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
-                    type="submit"
                     disabled={loading}
                     onClick={(e) => {
-                      onSaveDraft(proposal)
+                      saveDraftProposal(proposal)
                     }}
                   >
                     Save Draft
+                  </button>
+                  <button
+                    key="draft"
+                    className={`btn btn-secondary text-lg mt-8 ml-auto ${
+                      loading ? 'loading' : ''
+                    }`}
+                    style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
+                    disabled={loading}
+                    onClick={(e) => {
+                      deleteDraftProposal()
+                    }}
+                  >
+                    Delete Draft
                   </button>
                 </div>
               )}

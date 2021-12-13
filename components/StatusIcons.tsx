@@ -3,6 +3,7 @@ import SvgPassed from './icons/Passed'
 import SvgExecuted from './icons/Executed'
 import SvgOpen from './icons/Open'
 import SvgRejected from './icons/Rejected'
+import SvgDraft from './icons/Draft'
 
 const StatusIcons: { [key: string]: JSX.Element } = {
   open: <SvgOpen color={STATUS_COLORS.open} style={{ display: 'inline' }} />,
@@ -15,6 +16,9 @@ const StatusIcons: { [key: string]: JSX.Element } = {
   rejected: (
     <SvgRejected color={STATUS_COLORS.rejected} style={{ display: 'inline' }} />
   ),
+  draft: (
+    <SvgDraft color={STATUS_COLORS.draft} style={{ display: 'inline' }} />
+  )
 }
 
 export default StatusIcons

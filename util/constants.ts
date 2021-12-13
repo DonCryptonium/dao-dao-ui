@@ -28,4 +28,5 @@ export const STATUS_COLORS: { [key: string]: string } = {
   executed: '#53D0C9',
   passed: '#6A78FF',
   rejected: '#ED5276',
+  draft: '#aaaaff'
 }

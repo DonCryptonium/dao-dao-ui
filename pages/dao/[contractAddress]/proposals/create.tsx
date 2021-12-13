@@ -24,14 +24,14 @@ const ProposalCreate: NextPage = () => {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const proposalId = useRecoilValue<string>(nextDraftProposalIdSelector(1))
-  const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
+  // const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
 
-  const saveDraftProposal = (proposal: DraftProposal) => {
-    setProposalMap({
-      ...proposalMap,
-      [proposalId]: { ...proposal, id: proposalId },
-    })
-  }
+  // const saveDraftProposal = (proposal: DraftProposal) => {
+  //   setProposalMap({
+  //     ...proposalMap,
+  //     [proposalId]: { ...proposal, id: proposalId },
+  //   })
+  // }
 
   const handleProposal = async (proposal: DraftProposal) => {
     setLoading(true)
@@ -80,7 +80,7 @@ const ProposalCreate: NextPage = () => {
   ) : (
     <ProposalEditor
       onProposal={handleProposal}
-      onSaveDraft={saveDraftProposal}
+      // onSaveDraft={saveDraftProposal}
       error={error}
       loading={loading}
       contractAddress={contractAddress}
