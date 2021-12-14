@@ -5,7 +5,7 @@ import {
 } from '@dao-dao/types/contracts/cw3-dao'
 import { ExecuteMsg as DAOExecuteMsg } from '@dao-dao/types/contracts/cw20-gov'
 import {
-  Proposal as ProposalState,
+  Proposal,
   Status,
   Threshold,
   Vote,
@@ -14,34 +14,23 @@ import {
 
 import { labelForMessage } from '../../util/messagehelpers'
 import { MessageMap } from './messageMap'
-import { DRAFT_SIGIL } from 'atoms/proposal'
+import { DRAFT_SIGIL, ProposalMapItem } from 'atoms/proposal'
 
 export const MEMO_MAX_LEN = 255
 
-export interface DraftProposal {
-  id: string
-  title: string
-  description: string
-  messageMap: MessageMap
-  nextId: number
-  // Which message is currently selected
-  activeMessageId: string
-  status: string
-  pendingMessages: {
-    [key: string]: CosmosMsgFor_Empty | ExecuteMsg | DAOExecuteMsg
-  }
-}
-
-export const EmptyProposal: DraftProposal = {
-  id: DRAFT_SIGIL,
-  title: '',
-  description: '',
-  nextId: 0,
-  messageMap: {},
-  activeMessageId: '',
-  pendingMessages: {},
-  status: 'draft'
-}
+// export interface DraftProposal {
+//   id: string
+//   title: string
+//   description: string
+//   messageMap: MessageMap
+//   nextId: number
+//   // Which message is currently selected
+//   activeMessageId: string
+//   status: string
+//   pendingMessages: {
+//     [key: string]: CosmosMsgFor_Empty | ExecuteMsg | DAOExecuteMsg
+//   }
+// }
 
 const EmptyThreshold: Threshold = {
   threshold_quorum: {
@@ -57,7 +46,7 @@ const EmptyVotes: Votes = {
   veto: '',
 }
 
-export const EmptyProposalState: ProposalState = {
+export const EmptyProposal: Proposal = {
   title: '',
   description: '',
   expires: {
@@ -73,9 +62,14 @@ export const EmptyProposalState: ProposalState = {
   votes: { ...EmptyVotes },
 }
 
-export function memoForProposal(proposal: DraftProposal): string {
-  const messagesMemo = Object.values(proposal.messageMap)
-    .map((msg) => labelForMessage(msg.message))
+export const EmptyProposalItem: ProposalMapItem = {
+  proposal: EmptyProposal,
+  draft: true
+}
+
+export function memoForProposal(proposal: Proposal, messages: CosmosMsgFor_Empty[]): string {
+  const messagesMemo = messages
+    .map((msg) => labelForMessage(msg))
     .join(', ')
   return `${proposal.title}\n${proposal.description}\n\n${messagesMemo}`.slice(
     0,

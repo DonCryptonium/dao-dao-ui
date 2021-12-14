@@ -23,7 +23,7 @@ const ProposalCreate: NextPage = () => {
   const [transactionHash, setTransactionHash] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
-  const proposalId = useRecoilValue<string>(nextDraftProposalIdSelector(1))
+  const proposalId = useRecoilValue<string>(nextDraftProposalIdSelector)
   // const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
 
   // const saveDraftProposal = (proposal: DraftProposal) => {

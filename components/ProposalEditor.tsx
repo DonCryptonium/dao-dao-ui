@@ -44,7 +44,6 @@ export default function ProposalEditor({
   loading,
   error,
   onProposal,
-  onSaveDraft,
   contractAddress,
   recipientAddress,
 }: {
@@ -52,7 +51,6 @@ export default function ProposalEditor({
   loading?: boolean
   error?: string
   onProposal: (proposal: DraftProposal) => void
-  onSaveDraft?: (proposal: DraftProposal) => void
   contractAddress: string
   recipientAddress: string
 }) {
@@ -70,23 +68,24 @@ export default function ProposalEditor({
     formState: { errors },
   } = useForm()
   const router = useRouter()
-  const nextProposalId = useRecoilValue<string>(nextDraftProposalIdSelector(1))
+  const nextProposalId = useRecoilValue<string>(nextDraftProposalIdSelector)
   const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
   const proposalId = initialProposal?.id || nextProposalId
+  const proposalsListRoute = `/dao/${contractAddress}/proposals`
 
   const saveDraftProposal = (proposal: DraftProposal) => {
     setProposalMap({
       ...proposalMap,
       [proposalId]: { ...proposal, id: proposalId },
     })
-    router.push(`/dao/${contractAddress}/proposals`)
+    router.push(proposalsListRoute)
   }
 
   const deleteDraftProposal = () => {
     const nextProposalMap = {...proposalMap}
     delete nextProposalMap[proposalId]
     setProposalMap(nextProposalMap)
-    router.push(`/dao/${contractAddress}/proposals`)
+    router.push(proposalsListRoute)
   }
 
   // const handleProposal = async (proposal: DraftProposal) => {

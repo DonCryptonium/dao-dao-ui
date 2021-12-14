@@ -1,14 +1,23 @@
 import { atom, AtomEffect } from 'recoil'
 
-import { DraftProposal } from 'models/proposal/proposal'
+import { Proposal } from '@dao-dao/types/contracts/cw3-dao'
 
 export const DRAFT_SIGIL = '_'
 
-export type DraftProposalMap = {
-  [key: string]: DraftProposal
+
+export interface ProposalKey {
+  contractAddress: string
+  proposalId: number
 }
 
-const localStorageEffect: (key: string) => AtomEffect<DraftProposalMap> =
+export interface ProposalMapItem {
+  proposal: Proposal
+  draft: boolean
+}
+
+export type ProposalMap = Map<ProposalKey, ProposalMapItem>
+
+const localStorageEffect: <T> (key: string) => AtomEffect<T> =
   (key) =>
   ({ setSelf, onSet }) => {
     const savedValue = localStorage.getItem(key)
@@ -23,20 +32,8 @@ const localStorageEffect: (key: string) => AtomEffect<DraftProposalMap> =
     })
   }
 
-export const draftProposalMap = atom<DraftProposalMap>({
-  key: 'DraftProposalMap',
-  default: {},
-  effects_UNSTABLE: [localStorageEffect('draftProposalMap')],
+export const proposalMap = atom<ProposalMap>({
+  key: 'ProposalMap',
+  default: new Map<ProposalKey, ProposalMapItem>(),
+  effects_UNSTABLE: [localStorageEffect<ProposalMap>('proposalMap')],
 })
-
-export const nextDraftProposalId = atom<number>({
-  key: 'NextDraftProposalId',
-  default: 1,
-})
-
-// type SetSelfType = (
-//   | T
-//   | DefaultValue
-//   | Promise<T | DefaultValue> // Only allowed for initialization at this time
-//   | ((T | DefaultValue) => T | DefaultValue),
-// ) => void
