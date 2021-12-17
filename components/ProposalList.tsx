@@ -1,5 +1,6 @@
 import ProposalCard from 'components/ProposalCard'
 import { ProposalResponse, Timestamp } from '@dao-dao/types/contracts/cw3-dao'
+import { ProposalMapItem } from 'atoms/proposal'
 
 type Expiration = {
   at_time: Timestamp
@@ -12,7 +13,7 @@ function ProposalList({
   onLoadMore,
 }: {
   contractAddress: string
-  proposals: ProposalResponse[]
+  proposals: ProposalMapItem[]
   hideLoadMore: boolean
   onLoadMore: () => void
 }) {
@@ -25,14 +26,14 @@ function ProposalList({
       )}
       {proposals &&
         proposals.map((proposal, idx) => {
-          const { title, id, status } = proposal
+          const { title, id, status } = proposal.proposal
           let expires: Expiration
           if (typeof id !== 'number') {
             expires = {
               at_time: '0' 
             }
           } else {
-            expires = proposal.expires as Expiration
+            expires = proposal.proposal?.expires as Expiration
           }
           
 

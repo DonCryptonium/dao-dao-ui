@@ -1,10 +1,10 @@
 import { MessageMapEntry, ProposalMessageType } from './messageMap'
-import { DraftProposal } from './proposal'
 import { ProposalAction } from './proposalActions'
 import { proposalForMessage } from './proposalForMessage'
 import { getActiveMessageId, sortedMessages } from './proposalSelectors'
+import { Proposal } from '@dao-dao/types/contracts/cw3-dao'
 
-function checkUpdated(updated: DraftProposal) {
+function checkUpdated(updated: Proposal) {
   if (
     updated?.activeMessageId &&
     !updated.messageMap[updated.activeMessageId]
@@ -16,9 +16,9 @@ function checkUpdated(updated: DraftProposal) {
   return updated
 }
 export function ProposalReducer(
-  state: DraftProposal,
+  state: Proposal,
   action: ProposalAction
-): DraftProposal {
+): Proposal {
   switch (action.type) {
     case 'setTitle':
       const updated = { ...state, title: action.title }
@@ -46,7 +46,7 @@ export function ProposalReducer(
           updatedActiveMessageId = newMessages[0].id
         }
       }
-      const updatedProposal: DraftProposal = {
+      const updatedProposal: Proposal = {
         ...state,
         messageMap,
         activeMessageId: updatedActiveMessageId ?? currentActiveMessageId,

@@ -1,8 +1,8 @@
-import { CosmosMsgFor_Empty } from '@dao-dao/types/contracts/cw3-dao'
-import { draftProposalMap } from 'atoms/proposal'
+import { CosmosMsgFor_Empty, Proposal } from '@dao-dao/types/contracts/cw3-dao'
+import { proposalMap as proposalMapAtom, ProposalMapItem } from 'atoms/proposal'
 import { useThemeContext } from 'contexts/theme'
 import { ProposalMessageType } from 'models/proposal/messageMap'
-import { DraftProposal, EmptyProposal, memoForProposal } from 'models/proposal/proposal'
+import { EmptyProposal, memoForProposal } from 'models/proposal/proposal'
 import {
   ProposalAction,
   ProposalRemoveMessage,
@@ -47,10 +47,10 @@ export default function ProposalEditor({
   contractAddress,
   recipientAddress,
 }: {
-  initialProposal?: DraftProposal
+  initialProposal?: Proposal
   loading?: boolean
   error?: string
-  onProposal: (proposal: DraftProposal) => void
+  onProposal: (proposal: Proposal) => void
   contractAddress: string
   recipientAddress: string
 }) {
@@ -68,23 +68,29 @@ export default function ProposalEditor({
     formState: { errors },
   } = useForm()
   const router = useRouter()
-  const nextProposalId = useRecoilValue<string>(nextDraftProposalIdSelector)
-  const [proposalMap, setProposalMap] = useRecoilState(draftProposalMap)
-  const proposalId = initialProposal?.id || nextProposalId
+  const nextProposalId = useRecoilValue<number>(nextDraftProposalIdSelector)
+  const [proposalMap, setProposalMap] = useRecoilState(proposalMapAtom)
+  const proposalId = initialProposal?.id || `${nextProposalId}`
   const proposalsListRoute = `/dao/${contractAddress}/proposals`
 
-  const saveDraftProposal = (proposal: DraftProposal) => {
-    setProposalMap({
-      ...proposalMap,
-      [proposalId]: { ...proposal, id: proposalId },
-    })
+  const saveDraftProposal = (proposal: Proposal) => {
+    proposalMap.set({contractAddress, proposalId: nextProposalId}, {
+      proposal,
+      draft: true
+    });
+    setProposalMap(proposalMap)
+    // setProposalMap({
+    //   ...proposalMap,
+    //   [proposalId]: { ...proposal, id: proposalId },
+    // })
     router.push(proposalsListRoute)
   }
 
   const deleteDraftProposal = () => {
-    const nextProposalMap = {...proposalMap}
-    delete nextProposalMap[proposalId]
-    setProposalMap(nextProposalMap)
+    proposalMap.delete({contractAddress, proposalId: nextProposalId})
+    // const nextProposalMap = {...proposalMap}
+    // delete nextProposalMap[proposalId]
+    setProposalMap(proposalMap)
     router.push(proposalsListRoute)
   }
 
@@ -158,7 +164,7 @@ export default function ProposalEditor({
 
   const complete = false
 
-  function isProposalValid(proposalToCheck: DraftProposal): boolean {
+  function isProposalValid(proposalToCheck: Proposal): boolean {
     if (!proposalToCheck) {
       return false
     }
