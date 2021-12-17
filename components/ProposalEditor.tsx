@@ -1,5 +1,6 @@
 import { CosmosMsgFor_Empty, Proposal } from '@dao-dao/types/contracts/cw3-dao'
 import { proposalMap as proposalMapAtom, ProposalMapItem } from 'atoms/proposal'
+import HelpTooltip from 'components/HelpTooltip'
 import { useThemeContext } from 'contexts/theme'
 import { ProposalMessageType } from 'models/proposal/messageMap'
 import { EmptyProposal, memoForProposal } from 'models/proposal/proposal'
@@ -380,8 +381,8 @@ export default function ProposalEditor({
   const fieldErrorMessage = makeFieldErrorMessage(errors)
 
   const editorClassName = proposalDescriptionErrorMessage
-    ? 'input input-error input-bordered rounded box-border py-3 px-8 h-full w-full focus:input-primary text-xl'
-    : 'input input-bordered rounded box-border py-3 px-8 h-full w-full focus:input-primary text-xl'
+    ? 'input input-error input-bordered rounded box-border py-3 px-8 h-full w-full text-xl'
+    : 'input input-bordered rounded box-border py-3 px-8 h-full w-full text-xl'
 
   const errorComponent = error ? (
     <div className="mt-8">
@@ -427,7 +428,8 @@ export default function ProposalEditor({
                 id="description"
               />
               <label htmlFor="message-list" className="block mt-4 text-xl">
-                Messages
+                Messages{' '}
+                <HelpTooltip text="Messages that will be executed on chain." />
               </label>
               <ul id="message-list">{messages}</ul>
               <br />
