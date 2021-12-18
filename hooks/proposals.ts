@@ -1,12 +1,13 @@
 import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
 import { useEffect, useState } from 'react'
 import {
+  Proposal,
   ProposalListResponse,
   ProposalResponse,
   VoteInfo,
 } from '@dao-dao/types/contracts/cw3-dao'
 import { useSigningClient } from 'contexts/cosmwasm'
-import { memoForProposal, Proposal } from 'models/proposal/proposal'
+import { memoForProposal } from 'models/proposal/proposal'
 import { messageForProposal } from 'models/proposal/proposalSelectors'
 import { defaultExecuteFee } from 'util/fee'
 
@@ -169,7 +170,7 @@ export function useCreateProposal(contractAddress: string) {
     setError('')
 
     const propose = messageForProposal(proposal, contractAddress)
-    const memo = memoForProposal(proposal)
+    const memo = memoForProposal(proposal, [])
 
     try {
       const response = await signingClient?.execute(

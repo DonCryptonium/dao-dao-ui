@@ -17,6 +17,6 @@
     "baseUrl": ".",
     "sourceMap": true
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "models/proposal/proposalSelectors.ts_disabled"],
   "exclude": ["node_modules", "tools"]
 }

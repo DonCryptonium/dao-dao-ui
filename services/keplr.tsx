@@ -1,4 +1,5 @@
 import { convertFromMicroDenom } from 'util/conversion'
+import { Window as KeplrWindow } from "@keplr-wallet/types";
 
 // extend window with CosmosJS and Keplr properties
 interface CosmosKeplrWindow extends Window {

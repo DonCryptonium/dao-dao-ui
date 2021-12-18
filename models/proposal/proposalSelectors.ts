@@ -1,4 +1,10 @@
-import { BankMsg, Coin, Uint128 } from '@dao-dao/types/contracts/cw3-dao'
+import {
+  BankMsg,
+  Coin,
+  Uint128,
+  Proposal,
+  ProposalResponse,
+} from '@dao-dao/types/contracts/cw3-dao'
 import { ExecuteMsg as MintExecuteMsg } from '@dao-dao/types/contracts/cw20-gov'
 import {
   MessageMap,
@@ -7,99 +13,48 @@ import {
   messageSort,
 } from './messageMap'
 import { makeExecutableMintMessage } from '../../util/messagehelpers'
-import { Proposal } from './proposal'
 import {
   convertDenomToContractReadableDenom,
   convertDenomToMicroDenom,
 } from '../../util/conversion'
+import { isBankMsg, isBurnMsg, isSendMsg, MintMsg } from 'selectors/message'
 
-/// Returns the outgoing message for COSMOS
-export function messageForProposal(
-  proposal: Proposal,
-  contractAddress: string
-) {
-  const msgs = Object.values(proposal.messageMap).map((mapEntry) => {
-    // Spend proposals are inputted in human readable form (ex:
-    // junox). Contracts expect things in the micro form (ex: ujunox)
-    // so we, painfully, do some conversions:
-    if (mapEntry.messageType === ProposalMessageType.Spend) {
-      let microMessage = mapEntry.message
-      const bank = (microMessage as any).bank as BankMsg
-      if (!bank) {
-        return
-      }
-
-      let amounts: Coin[]
-      let variant: string
-      if ('send' in bank) {
-        amounts = (bank as any).send.amount
-        variant = 'send'
-      } else if ('burn' in bank) {
-        amounts = (bank as any).burn.amount
-        variant = 'burn'
-      } else {
-        console.error(`unexpected bank message: (${JSON.stringify(bank)})`)
-        return
-      }
-
-      const microAmounts = amounts.map((coin) => {
-        const microCoin = coin
-        microCoin.amount = convertDenomToMicroDenom(coin.amount)
-        microCoin.denom = convertDenomToContractReadableDenom(coin.denom)
-        return microCoin
-      }) as Coin[]
-
-      ;(((microMessage as any).bank as any)[variant] as any).amount =
-        microAmounts
-
-      return microMessage
-    }
-    if (mapEntry.messageType === ProposalMessageType.Mint) {
-      const mintMessage = mapEntry.message as any
-      if (mintMessage.amount) {
-        mintMessage.amount = convertDenomToMicroDenom(mintMessage.amount)
-      }
-      return makeExecutableMintMessage(mintMessage, contractAddress) as any
-    }
-    return mapEntry.message
-  })
-  const msg: Record<string, unknown> = {
-    title: proposal.title,
-    description: proposal.description,
-    msgs,
+function convertToMicroAmounts(amounts: Coin[]) {
+  for (const coin of amounts) {
+    coin.amount = convertDenomToMicroDenom(coin.amount)
+    coin.denom = convertDenomToContractReadableDenom(coin.denom)
   }
-  return msg
 }
 
 /// If there's no active ID, this is the first one
 /// for a given message type.
-export function topmostId(
-  proposal: Proposal,
-  messageType?: ProposalMessageType
-): string | undefined {
-  const messages = proposalMessages(proposal, messageType)
-  if (messages?.length) {
-    return messages[0].id
-  }
-  return undefined
-}
+// export function topmostId(
+//   proposal: Proposal,
+//   messageType?: ProposalMessageType
+// ): string | undefined {
+//   const messages = proposalMessages(proposal, messageType)
+//   if (messages?.length) {
+//     return messages[0].id
+//   }
+//   return undefined
+// }
 
 export function getMessage(
   proposal: Proposal,
   messageId: string
 ): MessageMapEntry | undefined {
-  return proposal.messageMap[messageId]
+  // return proposal.messageMap[messageId]
+  return undefined
 }
 
 export function getActiveMessageId(proposal: Proposal): string {
-  return proposal.activeMessageId
+  // return proposal.activeMessageId
+  return ''
 }
 
-export function getSpendAmount(
-  spendMsg?: MessageMapEntry
-): Uint128 | undefined {
-  if (spendMsg?.messageType === ProposalMessageType.Spend) {
-    const coins = (spendMsg.message as any)?.bank?.send?.amount as Coin[]
+export function getSpendAmount(spendMsg?: BankMsg): Uint128 | undefined {
+  if (isSendMsg(spendMsg)) {
+    const coins = spendMsg.send?.amount as Coin[]
     if (coins?.length) {
       return coins[0]?.amount
     }
@@ -107,11 +62,9 @@ export function getSpendAmount(
   return undefined
 }
 
-export function getSpendRecipient(
-  spendMsg?: MessageMapEntry
-): string | undefined {
-  if (spendMsg?.messageType === ProposalMessageType.Spend) {
-    const send = (spendMsg.message as any)?.bank?.send
+export function getSpendRecipient(spendMsg?: BankMsg): string | undefined {
+  if (isSendMsg(spendMsg)) {
+    const send = spendMsg.send
     if (send) {
       return send?.to_address
     }
@@ -119,23 +72,20 @@ export function getSpendRecipient(
   return undefined
 }
 
-export function getMintAmount(
-  mintMessage?: MessageMapEntry
-): Uint128 | undefined {
-  if (mintMessage?.messageType === ProposalMessageType.Mint) {
-    const amount = (mintMessage.message as any)?.mint.amount
-    return amount
-  }
-  return undefined
+export function getMintRecipient(mintMsg?: MintMsg) {
+  return mintMsg?.wasm?.execute?.msg?.mint?.recipient
 }
 
-export const getMintRecipient = getSpendRecipient
+export function getMintAmount(mintMessage?: MintMsg): Uint128 | undefined {
+  return mintMessage?.wasm?.execute?.msg?.mint?.amount
+}
 
 export function proposalMessages(
-  proposal: Proposal,
+  proposal: Proposal | ProposalResponse,
   messageType?: ProposalMessageType // Optional filter
 ) {
-  return sortedMessages(proposal.messageMap, messageType)
+  // return sortedMessages(proposal.messageMap, messageType)
+  return proposal.msgs
 }
 
 export function sortedMessages(

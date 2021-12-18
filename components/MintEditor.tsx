@@ -10,14 +10,14 @@ import {
 import { FormEvent, useState } from 'react'
 import { isValidAddress } from 'util/isValidAddress'
 import { makeMintMessage } from '../util/messagehelpers'
+import { BankMsg } from '@dao-dao/types/contracts/cw3-dao'
+import { MintMsg } from 'selectors/message'
 
 export default function MintEditor({
-  dispatch,
   initialRecipientAddress,
   mintMsg,
 }: {
-  dispatch: (action: ProposalAction) => void
-  mintMsg?: MessageMapEntry
+  mintMsg: MintMsg
   initialRecipientAddress: string
 }) {
   const [validAddress, setValidAddress] = useState(
@@ -38,29 +38,30 @@ export default function MintEditor({
       e.preventDefault()
       e.stopPropagation()
     }
-    const recipient = options?.recipientAddress ?? recipientAddress
+    console.warn(`update mint`)
+    // const recipient = options?.recipientAddress ?? recipientAddress
 
-    try {
-      const id = mintMsg?.id ?? ''
-      const messageType = mintMsg?.messageType ?? ProposalMessageType.Mint
-      let action: ProposalAction
+    // try {
+    //   const id = mintMsg?.id ?? ''
+    //   const messageType = mintMsg?.messageType ?? ProposalMessageType.Mint
+    //   let action: ProposalAction
 
-      const message = makeMintMessage(amount, recipient)
-      if (id) {
-        action = {
-          type: 'updateMessage',
-          id,
-          message,
-        }
-      } else {
-        action = {
-          type: 'addMessage',
-          message,
-          messageType,
-        }
-      }
-      dispatch(action)
-    } catch (e) {}
+    //   const message = makeMintMessage(amount, recipient)
+    //   if (id) {
+    //     action = {
+    //       type: 'updateMessage',
+    //       id,
+    //       message,
+    //     }
+    //   } else {
+    //     action = {
+    //       type: 'addMessage',
+    //       message,
+    //       messageType,
+    //     }
+    //   }
+    //   console.dir(action)
+    // } catch (e) {}
   }
 
   function handleRecipientAddress(e: React.FormEvent<HTMLInputElement>) {
@@ -85,7 +86,7 @@ export default function MintEditor({
   return (
     <div>
       <label htmlFor="amount" className="block mt-4">
-        Amount
+        Mint Amount
       </label>
       <input
         type="number"

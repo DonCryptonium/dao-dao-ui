@@ -1,25 +1,42 @@
+import { VoteInfo } from '@dao-dao/types/contracts/cw3-dao'
+import ProposalVotes from 'components/ProposalVotes'
 import VoteButtons from 'components/VoteButtons'
 import { useThemeContext } from 'contexts/theme'
-import { VoteInfo, ProposalResponse } from '@dao-dao/types/contracts/cw3-dao'
-import ProposalVotes from 'components/ProposalVotes'
+import { useRecoilValue } from 'recoil'
+import { proposal as proposalItem } from 'atoms/proposal'
 import ProposalStatus from './ProposalStatus'
+import {ProposalMapItem} from 'atoms/proposal'
 
 function ProposalDetails({
-  proposal,
+  proposalId,
+  contractAddress,
   walletAddress,
   votes,
   vote,
   execute,
   close,
 }: {
-  proposal: ProposalResponse
+  proposalId: number
+  contractAddress: string
   walletAddress: string
   votes: VoteInfo[]
   vote: (arg0: string) => Promise<void>
   execute: () => void
   close: () => void
 }) {
-  const themeContext = useThemeContext()
+  const proposalInfo = useRecoilValue<
+  ProposalMapItem
+>(proposalItem({contractAddress, proposalId}))
+
+  if (!proposalInfo?.proposal) {
+    return <h1>Unexpected error</h1>
+  }
+
+  // const proposalInfo = useRecoilValue(
+  //   proposalItem({ contractAddress, proposalId })
+  // )
+  // const themeContext = useThemeContext()
+  const proposal = proposalInfo.proposal
 
   const proposalMessageContent = proposal?.msgs?.length ? (
     <code className="mb-12 break-all whitespace-pre">

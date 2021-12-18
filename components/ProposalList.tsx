@@ -26,7 +26,9 @@ function ProposalList({
       )}
       {proposals &&
         proposals.map((proposal, idx) => {
-          const { title, id, status } = proposal.proposal
+          const { title } = proposal.proposal
+          const id = proposal.id
+          const status = proposal?.draft ? 'draft' : proposal.proposal.status
           let expires: Expiration
           if (typeof id !== 'number') {
             expires = {
@@ -45,6 +47,7 @@ function ProposalList({
               status={status}
               expires_at={parseInt(expires.at_time)}
               contractAddress={contractAddress}
+              proposalId={id}
             />
           )
         })}

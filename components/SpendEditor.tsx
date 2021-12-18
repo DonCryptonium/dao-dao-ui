@@ -1,3 +1,4 @@
+import { BankMsg } from '@dao-dao/types/contracts/cw3-dao'
 import {
   MessageMapEntry,
   ProposalMessageType,
@@ -12,14 +13,14 @@ import { isValidAddress } from 'util/isValidAddress'
 import { makeSpendMessage } from '../util/messagehelpers'
 
 export default function SpendEditor({
-  dispatch,
   contractAddress,
+  proposalId,
   initialRecipientAddress,
   spendMsg,
 }: {
-  dispatch: (action: ProposalAction) => void
-  spendMsg?: MessageMapEntry
-  contractAddress: string
+  contractAddress: string,
+  proposalId: number,
+  spendMsg?: BankMsg
   initialRecipientAddress: string
 }) {
   const [validAddress, setValidAddress] = useState(
@@ -43,25 +44,27 @@ export default function SpendEditor({
     const recipient = options?.recipientAddress ?? recipientAddress
 
     try {
-      const id = spendMsg?.id ?? ''
-      const messageType = spendMsg?.messageType ?? ProposalMessageType.Spend
-      let action: ProposalAction
+      // const id = spendMsg?.id ?? ''
+      // const messageType = spendMsg?.messageType ?? ProposalMessageType.Spend
+      // let action: ProposalAction
 
       const message = makeSpendMessage(amount, recipient, contractAddress)
-      if (id) {
-        action = {
-          type: 'updateMessage',
-          id,
-          message,
-        }
-      } else {
-        action = {
-          type: 'addMessage',
-          message,
-          messageType,
-        }
-      }
-      dispatch(action)
+      console.dir(message)
+      // if (id) {
+      //   action = {
+      //     type: 'updateMessage',
+      //     id,
+      //     message,
+      //   }
+      // } else {
+      //   action = {
+      //     type: 'addMessage',
+      //     message,
+      //     messageType,
+      //   }
+      // }
+      // // dispatch(action)
+      // console.dir(action)
     } catch (e) {}
   }
 

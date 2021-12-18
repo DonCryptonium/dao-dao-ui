@@ -23,10 +23,8 @@ function getEditorTheme(appTheme: string): string {
 }
 
 export default function CustomEditor({
-  dispatch,
   customMsg,
 }: {
-  dispatch: (action: ProposalAction) => void
   customMsg: MessageMapEntry
 }) {
   const [error, setError] = useState<JSONError | undefined>(undefined)
@@ -54,7 +52,7 @@ export default function CustomEditor({
           messageType,
         }
       }
-      dispatch(action)
+      console.dir(action)
     } catch (err) {
       console.error(err)
     }

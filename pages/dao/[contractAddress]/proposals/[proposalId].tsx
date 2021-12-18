@@ -1,28 +1,71 @@
-import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-
 import LineAlert from 'components/LineAlert'
-import { isDraftProposalId, proposal as proposalItem } from 'selectors/proposal'
-import { useRecoilValue } from 'recoil'
 import ProposalDetails from 'components/ProposalDetails'
 import ProposalEditor from 'components/ProposalEditor'
+import { useSigningClient } from 'contexts/cosmwasm'
+import { EmptyProposal } from 'models/proposal/proposal'
+import type { NextPage } from 'next'
+import { useRouter } from 'next/router'
+import { useState } from 'react'
+import { useRecoilValue, useRecoilState } from 'recoil'
+import { createProposal } from 'util/proposal'
+import { ProposalMapItem, proposal as proposalItem } from 'atoms/proposal'
 
 const Proposal: NextPage = () => {
   let router = useRouter()
   const contractAddress = router.query.contractAddress as string
 
-  const proposalId = router.query.proposalId as string
+  const proposalId = parseInt((router.query.proposalId as string) ?? '-1', 10)
 
-  const proposalInfo = useRecoilValue(
+  // const [proposalInfo, setProposalMapItem] = useRecoilState<
+  //   ProposalMapItem | undefined
+  // >(makeProposalItemAtom(contractAddress, proposalId))
+
+  const proposalInfo = useRecoilValue<ProposalMapItem | undefined>(
     proposalItem({ contractAddress, proposalId })
   )
 
-  const walletAddress = ''
-  const transactionHash = ''
+  // console.dir(proposalInfoItem)
+
+  // const proposalInfo = useRecoilValue(
+  //   proposalItem({ contractAddress, proposalId })
+  // )
+
+  // const walletAddress = ''
+  // const transactionHash = ''
   const votes: any[] = []
   const vote = async () => {}
   const execute = async () => {}
-  const error = undefined
+  // const error = undefined
+
+  // const proposal = isProposal(proposalInfo?.proposal)
+  //   ? proposalInfo?.proposal
+  //   : { ...EmptyProposal }
+
+  // const router = useRouter()
+  // const contractAddress = router.query.contractAddress as string
+
+  const { walletAddress, signingClient } = useSigningClient()
+  const [transactionHash, setTransactionHash] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  if (!proposalInfo) {
+    // Item was removed, so we can't render it
+    const proposalsListRoute = `/dao/${contractAddress}/proposals`
+    router.push(proposalsListRoute)
+    return <h1>Error: proposal id {proposalId} not found</h1>
+  }
+
+  const handleProposal = createProposal({
+    contractAddress,
+    router,
+    walletAddress,
+    signingClient,
+    setTransactionHash,
+    setError,
+    setLoading,
+    resetOnChainProposals: () => {}
+  })
 
   // const {
   //   walletAddress,
@@ -36,7 +79,7 @@ const Proposal: NextPage = () => {
   //   close,
   // } = proposalInfo
 
-  const proposal = proposalInfo
+  /// const proposal = proposalInfo.proposal
 
   const initialMessage: string | undefined = router.query.initialMessage as any
   const initialMessageStatus: 'success' | 'error' | undefined = router.query
@@ -47,16 +90,17 @@ const Proposal: NextPage = () => {
       <LineAlert msg={initialMessage} variant={initialMessageStatus} />
     ) : null
 
-  const detailsComponent = isDraftProposalId(proposalId) ? (
-    <ProposalEditor initialProposal={proposal} 
-      onProposal={p => {}}
-      onSaveDraft={p => {}}
+  const detailsComponent = proposalInfo?.draft ? (
+    <ProposalEditor
+      proposalId={proposalId}
+      onProposal={handleProposal}
       recipientAddress=""
       contractAddress={contractAddress}
     />
-    ) : (
+  ) : (
     <ProposalDetails
-      proposal={proposal}
+      contractAddress={contractAddress}
+      proposalId={proposalId}
       walletAddress={walletAddress}
       votes={votes}
       vote={vote}
@@ -70,7 +114,7 @@ const Proposal: NextPage = () => {
       <div className="flex flex-col w-full">
         <div className="grid bg-base-100 place-items-center">
           {initialMessageComponent}
-          {!proposal ? (
+          {!proposalInfo ? (
             <div className="text-center m-8">
               No proposal with that ID found.
             </div>

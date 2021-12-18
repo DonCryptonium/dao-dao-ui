@@ -1,64 +1,63 @@
 import { CosmosMsgFor_Empty, Proposal } from '@dao-dao/types/contracts/cw3-dao'
-import { proposalMap as proposalMapAtom, ProposalMapItem } from 'atoms/proposal'
+import {
+  draftProposalItem,
+  makeProposalKeyString,
+  nextDraftProposalId,
+  proposalMap as proposalMapAtom,
+  ProposalMapItem,
+  proposals as proposalList,
+  proposal as proposalAtom,
+  draftProposal as draftProposalAtom,
+  contractProposalMap as contractProposalMapAtom,
+  draftProposals as draftProposalsAtom,
+  nextProposalRequestId as nextProposalRequestIdAtom,
+  onChainProposals
+} from 'atoms/proposal'
 import HelpTooltip from 'components/HelpTooltip'
 import { useThemeContext } from 'contexts/theme'
-import { ProposalMessageType } from 'models/proposal/messageMap'
-import { EmptyProposal, memoForProposal } from 'models/proposal/proposal'
-import {
-  ProposalAction,
-  ProposalRemoveMessage,
-  ProposalUpdateFromMessage
-} from 'models/proposal/proposalActions'
-import { ProposalReducer } from 'models/proposal/proposalReducer'
-import {
-  messageForProposal,
-  proposalMessages
-} from 'models/proposal/proposalSelectors'
-import { ChangeEvent, useReducer, useState } from 'react'
+import { EmptyProposal, EmptyProposalItem } from 'models/proposal/proposal'
+import { proposalMessages } from 'models/proposal/proposalSelectors'
+import { useRouter } from 'next/router'
+import { ChangeEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useRecoilState, useRecoilValue } from 'recoil'
-import {
-  nextDraftProposalIdSelector
-} from 'selectors/proposal'
-import { defaultExecuteFee } from 'util/fee'
-// import Editor from 'rich-markdown-editor'
-import { isValidAddress } from 'util/isValidAddress'
+import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil'
+import { isBankMsg, isBurnMsg, isMintMsg, isSendMsg } from 'selectors/message'
 import {
   labelForMessage,
   makeMintMessage,
-  makeSpendMessage
+  makeSpendMessage,
 } from 'util/messagehelpers'
-import CustomEditor from './CustomEditor'
+import { isProposal } from 'util/proposal'
 import InputField, {
   InputFieldLabel,
-  makeFieldErrorMessage
+  makeFieldErrorMessage,
 } from './InputField'
 import LineAlert from './LineAlert'
 import MessageSelector from './MessageSelector'
 import MintEditor from './MintEditor'
+import ProposalList from './ProposalList'
 import RawEditor from './RawEditor'
 import SpendEditor from './SpendEditor'
-import { useRouter } from 'next/router'
 
 export default function ProposalEditor({
-  initialProposal,
+  proposalId,
   loading,
   error,
   onProposal,
   contractAddress,
   recipientAddress,
 }: {
-  initialProposal?: Proposal
+  proposalId: number
   loading?: boolean
   error?: string
   onProposal: (proposal: Proposal) => void
   contractAddress: string
   recipientAddress: string
 }) {
-  const [proposal, dispatch] = useReducer(ProposalReducer, {
-    ...(initialProposal || EmptyProposal),
-  })
-  const [description, setDescription] = useState('')
+  const requestId = useRecoilValue(nextDraftProposalId)
+  const proposals = useRecoilValue(
+    proposalList({ contractAddress, startBefore: 0, requestId })
+  )
   const [editProposalJson, setEditProposalJson] = useState(false)
   const [proposalDescriptionErrorMessage, setProposalDescriptionErrorMessage] =
     useState('')
@@ -69,95 +68,70 @@ export default function ProposalEditor({
     formState: { errors },
   } = useForm()
   const router = useRouter()
-  const nextProposalId = useRecoilValue<number>(nextDraftProposalIdSelector)
-  const [proposalMap, setProposalMap] = useRecoilState(proposalMapAtom)
-  const proposalId = initialProposal?.id || `${nextProposalId}`
+  const setNextProposalId = useSetRecoilState<number>(nextDraftProposalId)
+  const [contractProposalMap, setContractProposalMap] = useRecoilState(contractProposalMapAtom)
+  const draftProposals = useRecoilValue(draftProposalsAtom(contractAddress))
+  const [proposalMapItem, setProposalMapItem] = useRecoilState(draftProposalAtom({contractAddress, proposalId}))
+  const [nextProposalRequestId, setNextProposalRequestId] = useRecoilState(nextProposalRequestIdAtom)
+  const resetProposals = useResetRecoilState(proposalList({ contractAddress, startBefore: 0, requestId }))
   const proposalsListRoute = `/dao/${contractAddress}/proposals`
 
-  const saveDraftProposal = (proposal: Proposal) => {
-    proposalMap.set({contractAddress, proposalId: nextProposalId}, {
-      proposal,
-      draft: true
-    });
-    setProposalMap(proposalMap)
-    // setProposalMap({
-    //   ...proposalMap,
-    //   [proposalId]: { ...proposal, id: proposalId },
-    // })
-    router.push(proposalsListRoute)
+  const proposal: Proposal =
+    proposalMapItem?.proposal && isProposal(proposalMapItem?.proposal)
+      ? proposalMapItem.proposal
+      : { ...EmptyProposal }
+
+  const saveDraftProposal = (draftProposal: Proposal) => {
+    const bumpNextId = !draftProposals || !draftProposals[proposalId]
+    setContractProposalMap({
+      ...contractProposalMap,
+      [contractAddress]: {
+        ...draftProposals,
+        [proposalId + '']: {...(proposalMapItem ?? draftProposalItem(draftProposal, proposalId)), proposal: draftProposal}
+      }
+    })
+    if (bumpNextId) {
+      setNextProposalId(proposalId + 1)
+    }
+    // router.push(proposalsListRoute)
   }
 
   const deleteDraftProposal = () => {
-    proposalMap.delete({contractAddress, proposalId: nextProposalId})
-    // const nextProposalMap = {...proposalMap}
-    // delete nextProposalMap[proposalId]
-    setProposalMap(proposalMap)
-    router.push(proposalsListRoute)
+    const updatedProposals = {...draftProposals}
+    delete updatedProposals[proposalId + '']
+    const updatedMap = {
+      ...contractProposalMap,
+      [contractAddress]: updatedProposals
+    }
+    setContractProposalMap(updatedMap)
   }
-
-  // const handleProposal = async (proposal: DraftProposal) => {
-  //   setLoading(true)
-  //   setError('')
-  //   const propose = messageForProposal(proposal, contractAddress)
-  //   const memo = memoForProposal(proposal)
-  //   try {
-  //     const response = await signingClient?.execute(
-  //       walletAddress,
-  //       contractAddress,
-  //       { propose },
-  //       defaultExecuteFee,
-  //       memo
-  //     )
-  //     setLoading(false)
-  //     if (response) {
-  //       setTransactionHash(response.transactionHash)
-  //       const [{ events }] = response.logs
-  //       const [wasm] = events.filter((e) => e.type === 'wasm')
-  //       const [{ value }] = wasm.attributes.filter(
-  //         (w) => w.key === 'proposal_id'
-  //       )
-  //       const initialMessage = `Saved Proposal "${proposal.title}"`
-  //       const paramStr = `initialMessage=${initialMessage}&initialMessageStatus=success`
-
-  //       router.push(`/dao/${contractAddress}/proposals/${value}?${paramStr}`)
-  //     }
-  //   } catch (e: any) {
-  //     console.error(
-  //       `Error submitting proposal ${JSON.stringify(proposal, undefined, 2)}`
-  //     )
-  //     console.dir(e)
-  //     console.error(e.message)
-  //     setLoading(false)
-  //     setError(e.message)
-  //   }
-  // }
 
   const messageActions = [
     {
       label: 'Spend',
       id: 'spend',
-      execute: () => addMessage(ProposalMessageType.Spend),
+      execute: () => addSpendMessage(),
       href: '#',
       isEnabled: () => true,
     },
     {
       label: 'Wasm',
       id: 'wasm',
-      execute: () => addMessage(ProposalMessageType.Wasm),
+      execute: () => addWasmMessage(),
       href: '#',
       isEnabled: () => true,
     },
     {
       label: 'Custom',
       id: 'custom',
-      execute: () => addMessage(ProposalMessageType.Custom),
+      execute: () => addCustomMessage(),
       href: '#',
       isEnabled: () => true,
     },
     {
       label: 'Mint',
       id: 'mint',
-      execute: () => addMessage(ProposalMessageType.Mint),
+      execute: () => addMintMessage(),
       href: '#',
       isEnabled: () => true,
     },
@@ -175,21 +149,54 @@ export default function ProposalEditor({
     return true
   }
 
-  function onSubmit(_formData: any) {
+  async function onSubmit(_formData: any) {
     // We don't actually care about what the form processor returned in this
     // case, just that the proposal is filled out correctly, which if
     // the submit method gets called it will be.
-    if (isProposalValid(proposal)) {
-      onProposal(proposal)
+    if (isProposal(proposal)) {
+      if (isProposalValid(proposal)) {
+        await onProposal(proposal)
+        setNextProposalRequestId(nextProposalRequestId + 1)
+        resetProposals()
+        deleteDraftProposal()
+      }
     }
   }
 
+  function updateProposal(updatedProposal: Proposal) {
+    console.log(`updateProposal for ${proposalId}`)
+    const updatedProposalItem = {
+      ...(proposalMapItem ?? EmptyProposalItem),
+      id: proposalId,
+      proposal: updatedProposal,
+    }
+    setProposalMapItem(updatedProposalItem)
+    const proposalIdKey = `${proposalId}`
+    // const bumpNextId = !draftProposals || !draftProposals[proposalIdKey]
+    setContractProposalMap({
+      ...contractProposalMap,
+      [contractAddress]: {
+        ...draftProposals,
+        [proposalIdKey]: updatedProposalItem
+      }
+    })
+    // if (bumpNextId) {
+    //   setNextProposalId(proposalId + 1)
+    // }
+  }
+
   function setProposalTitle(title: string) {
-    dispatch({ type: 'setTitle', title })
+    updateProposal({
+      ...proposal,
+      title,
+    })
   }
 
   function setProposalDescription(description: string) {
-    dispatch({ type: 'setDescription', description })
+    updateProposal({
+      ...proposal,
+      description,
+    })
     if (description) {
       setProposalDescriptionErrorMessage('')
     } else {
@@ -197,55 +204,70 @@ export default function ProposalEditor({
     }
   }
 
-  let messages = proposalMessages(proposal).map((mapEntry, key) => {
-    const label = labelForMessage(mapEntry.message)
+  let messages = proposalMessages(proposal).map((msg, messageIndex) => {
+    const label = labelForMessage(msg)
 
     let modeEditor = null
-    switch (mapEntry?.messageType) {
-      case ProposalMessageType.Spend:
+    if (isBankMsg(msg)) {
+      if (isSendMsg(msg.bank) && proposalId !== undefined) {
         modeEditor = (
           <SpendEditor
-            dispatch={dispatch}
-            spendMsg={mapEntry}
+            spendMsg={msg.bank}
             contractAddress={contractAddress}
             initialRecipientAddress={recipientAddress}
-          ></SpendEditor>
+            proposalId={proposalId}
+          />
         )
-        break
-      case ProposalMessageType.Mint: {
-        modeEditor = (
-          <MintEditor
-            dispatch={dispatch}
-            mintMsg={mapEntry}
-            initialRecipientAddress={recipientAddress}
-          ></MintEditor>
-        )
-        break
+      } else if (isBurnMsg(msg.bank)) {
+        modeEditor = <h1>BURN MESSAGE NOT IMPLEMENTED</h1>
       }
-      case ProposalMessageType.Custom:
-        modeEditor = <CustomEditor dispatch={dispatch} customMsg={mapEntry} />
-        break
-      case ProposalMessageType.Wasm:
-        modeEditor = <CustomEditor dispatch={dispatch} customMsg={mapEntry} />
-        break
+    } else if (isMintMsg(msg)) {
+      modeEditor = (
+        <MintEditor mintMsg={msg} initialRecipientAddress={recipientAddress} />
+      )
     }
+    // switch (mapEntry?.messageType) {
+    //   case ProposalMessageType.Spend:
+    //     modeEditor = (
+    //       <SpendEditor
+    //         spendMsg={msg}
+    //         contractAddress={contractAddress}
+    //         initialRecipientAddress={recipientAddress}
+    //       ></SpendEditor>
+    //     )
+    //     break
+    //   case ProposalMessageType.Mint: {
+    //     modeEditor = (
+    //       <MintEditor
+    //         mintMsg={msg}
+    //         initialRecipientAddress={recipientAddress}
+    //       ></MintEditor>
+    //     )
+    //     break
+    //   }
+    //   case ProposalMessageType.Custom:
+    //     modeEditor = <CustomEditor customMsg={msg} />
+    //     break
+    //   case ProposalMessageType.Wasm:
+    //     modeEditor = <CustomEditor customMsg={msg} />
+    //     break
+    // }
 
     return (
       <li
         className="py-8"
-        key={mapEntry.id}
-        onClick={() =>
-          dispatch({
-            type: 'setActiveMessage',
-            id: mapEntry.id,
-          })
-        }
+        key={`msg_${messageIndex}`}
+        onClick={() => setActiveMessage(messageIndex)}
       >
         <div title={label} className="whitespace-nowrap text-left">
           <h5 className="text-lg font-bold">
-            {mapEntry.messageType.toUpperCase()} {label}{' '}
+            {label}{' '}
             <button
-              onClick={() => removeMessage(mapEntry.id)}
+              onClick={(e) => {
+                e.stopPropagation()
+                e.preventDefault()
+                removeMessage(messageIndex)
+              }}
               title="Delete message"
               className="btn btn-circle btn-xs float-right"
             >
@@ -270,112 +292,78 @@ export default function ProposalEditor({
     )
   })
 
-  const addMessage = (messageType: ProposalMessageType) => {
-    if (messageType === ProposalMessageType.Spend) {
-      addSpendMessage()
-    } else if (messageType === ProposalMessageType.Mint) {
-      addMintMessage()
-    } else if (messageType === ProposalMessageType.Custom) {
-      addCustomMessage()
-    } else if (messageType === ProposalMessageType.Wasm) {
-      addWasmMessage()
-    }
+  const addMessage = (message: CosmosMsgFor_Empty) => {
+    updateProposal({
+      ...proposal,
+      msgs: [...proposal.msgs, message],
+    })
   }
 
   const addWasmMessage = () => {
-    const action: ProposalAction = {
-      type: 'addMessage',
-      message: { wasm: {} } as CosmosMsgFor_Empty,
-      messageType: ProposalMessageType.Wasm,
-    }
-    dispatch(action)
+    addMessage({ wasm: {} } as any)
   }
 
   const addCustomMessage = () => {
-    const action: ProposalAction = {
-      type: 'addMessage',
-      message: { custom: {} } as CosmosMsgFor_Empty,
-      messageType: ProposalMessageType.Custom,
-    }
-    dispatch(action)
+    addMessage({ custom: {} } as CosmosMsgFor_Empty)
   }
 
   const addSpendMessage = () => {
-    const validAddress = !!(
-      recipientAddress && isValidAddress(recipientAddress)
-    )
-    if (validAddress) {
-      try {
-        const message = makeSpendMessage('', recipientAddress, contractAddress)
-        const messageType = ProposalMessageType.Spend
-        const action: ProposalAction = {
-          type: 'addMessage',
-          message,
-          messageType,
-        }
-        dispatch(action)
-      } catch (e) {
-        console.error(e)
-      }
-    }
-  }
-
-  const addMintMessage = () => {
     try {
-      const message = makeMintMessage('', recipientAddress)
-      const messageType = ProposalMessageType.Mint
-      const action: ProposalAction = {
-        type: 'addMessage',
-        message,
-        messageType,
-      }
-      dispatch(action)
+      const message: CosmosMsgFor_Empty = makeSpendMessage(
+        '',
+        recipientAddress,
+        contractAddress
+      )
+      addMessage(message)
     } catch (e) {
       console.error(e)
     }
   }
 
-  const removeMessage = (messageId: string) => {
-    const removeMessageAction: ProposalRemoveMessage = {
-      type: 'removeMessage',
-      id: messageId,
+  const addMintMessage = () => {
+    try {
+      addMessage(makeMintMessage('', recipientAddress) as any)
+    } catch (e) {
+      console.error(e)
     }
-    dispatch(removeMessageAction)
+  }
+
+  const removeMessage = (messageIndex: number) => {
+    const msgs = [...proposal.msgs]
+    const removed = msgs.splice(messageIndex, 1)
+    if (removed) {
+      updateProposal({
+        ...proposal,
+        msgs,
+      })
+      // setActiveMessage(-1)
+    } else {
+      console.warn(`no message at ${messageIndex}`)
+    }
+  }
+
+  const setActiveMessage = (activeMessageIndex: number) => {
+    setProposalMapItem({
+      ...(proposalMapItem ?? EmptyProposalItem),
+      activeMessageIndex,
+    })
   }
 
   function handleJsonChanged(json: any) {
-    const updateFromJsonAction: ProposalUpdateFromMessage = {
-      type: 'updateFromMessage',
-      message: json,
-    }
     setEditProposalJson(false)
-    dispatch(updateFromJsonAction)
   }
 
-  function handleDescriptionChange(newValue: () => string) {
-    let val = newValue()
-    if (val.trim() == '\\') {
-      val = ''
-    }
-    setDescription(val)
-  }
-
-  function handleDescriptionBlur() {
-    setProposalDescription(description)
+  function handleDescriptionBlur(e: ChangeEvent<HTMLTextAreaElement>) {
+    setProposalDescription(e.target.value)
   }
 
   function handleDescriptionTextChange(e: ChangeEvent<HTMLTextAreaElement>) {
-    setDescription(e.target.value)
+    setProposalDescription(e.target.value)
   }
 
   // TODO preview mode for the whole proposal
   if (editProposalJson) {
-    return (
-      <RawEditor
-        json={messageForProposal(proposal, contractAddress)}
-        onChange={handleJsonChanged}
-      ></RawEditor>
-    )
+    return <RawEditor json={proposal} onChange={handleJsonChanged}></RawEditor>
   }
 
   const fieldErrorMessage = makeFieldErrorMessage(errors)
@@ -426,7 +414,7 @@ export default function ProposalEditor({
                 // dark={themeContext.theme === 'junoDark'}
                 onBlur={handleDescriptionBlur}
                 id="description"
-              />
+              ></textarea>
               <label htmlFor="message-list" className="block mt-4 text-xl">
                 Messages{' '}
                 <HelpTooltip text="Messages that will be executed on chain." />
@@ -447,33 +435,34 @@ export default function ProposalEditor({
                     style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
                     type="submit"
                     disabled={loading}
-                    onClick={(e) => {
-                      setProposalDescription(description)
-                    }}
                   >
                     Create Proposal
                   </button>
                   <button
-                    key="draft"
+                    key="save_draft"
                     className={`btn btn-secondary text-lg mt-8 ml-auto ${
                       loading ? 'loading' : ''
                     }`}
                     style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
                     disabled={loading}
                     onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       saveDraftProposal(proposal)
                     }}
                   >
                     Save Draft
                   </button>
                   <button
-                    key="draft"
+                    key="delete_draft"
                     className={`btn btn-secondary text-lg mt-8 ml-auto ${
                       loading ? 'loading' : ''
                     }`}
                     style={{ cursor: loading ? 'not-allowed' : 'pointer' }}
                     disabled={loading}
                     onClick={(e) => {
+                      e.preventDefault()
+                      e.stopPropagation()
                       deleteDraftProposal()
                     }}
                   >
@@ -486,6 +475,12 @@ export default function ProposalEditor({
           </div>
         </div>
       </div>
+      <ProposalList
+        proposals={proposals}
+        contractAddress={contractAddress}
+        hideLoadMore={true}
+        onLoadMore={() => {}}
+      />
     </div>
   )
 }

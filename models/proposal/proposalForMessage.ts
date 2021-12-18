@@ -1,5 +1,6 @@
-import { EmptyProposal, Proposal } from './proposal'
-import { ProposalReducer } from './proposalReducer'
+import { EmptyProposal } from './proposal'
+import { Proposal } from '@dao-dao/types/contracts/cw3-dao'
+// import { ProposalReducer } from './proposalReducer'
 
 export function proposalForMessage(json: any): Proposal {
   return updateProposalForMessage({ ...EmptyProposal }, json)
@@ -14,12 +15,12 @@ export function updateProposalForMessage(
   const msgs: any[] | undefined = json['msgs']
   let updatedProposal = { ...EmptyProposal }
   if (msgs && msgs?.length) {
-    for (const message of msgs) {
-      updatedProposal = ProposalReducer(updatedProposal, {
-        type: 'addMessage',
-        message,
-      })
-    }
+    // for (const message of msgs) {
+    //   updatedProposal = ProposalReducer(updatedProposal, {
+    //     type: 'addMessage',
+    //     message,
+    //   })
+    // }
   }
   if (!valid) {
     try {

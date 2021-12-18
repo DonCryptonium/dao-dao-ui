@@ -14,7 +14,7 @@ import {
 
 import { labelForMessage } from '../../util/messagehelpers'
 import { MessageMap } from './messageMap'
-import { DRAFT_SIGIL, ProposalMapItem } from 'atoms/proposal'
+import { ProposalMapItem } from 'atoms/proposal'
 
 export const MEMO_MAX_LEN = 255
 
@@ -67,8 +67,8 @@ export const EmptyProposalItem: ProposalMapItem = {
   draft: true
 }
 
-export function memoForProposal(proposal: Proposal, messages: CosmosMsgFor_Empty[]): string {
-  const messagesMemo = messages
+export function memoForProposal(proposal: Proposal): string {
+  const messagesMemo = proposal.msgs
     .map((msg) => labelForMessage(msg))
     .join(', ')
   return `${proposal.title}\n${proposal.description}\n\n${messagesMemo}`.slice(

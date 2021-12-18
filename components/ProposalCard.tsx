@@ -7,6 +7,7 @@ interface ProposalCardProps {
   contractAddress: string
   status: string
   expires_at: number
+  proposalId: number
 }
 
 export default function ProposalCard({
@@ -15,12 +16,13 @@ export default function ProposalCard({
   contractAddress,
   status,
   expires_at,
+  proposalId
 }: ProposalCardProps) {
   //// TODO https://github.com/DA0-DA0/cw-dao-dapp/issues/37
   // const expiresAtDateTime = new Date(expires_at / 1000000).toLocaleString()
 
   return (
-    <Link href={`${window.location.pathname}/${id}`}>
+    <Link href={`${window.location.pathname}/${proposalId}`}>
       <a>
         <div className={`card shadow-lg mb-4`}>
           <div className="card-body py-4 px-8">
