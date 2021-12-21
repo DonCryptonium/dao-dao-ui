@@ -1,4 +1,5 @@
 import { CosmosMsgFor_Empty, Proposal } from '@dao-dao/types/contracts/cw3-dao'
+import { walletAddress } from 'atoms/cosm'
 import {
   draftProposalItem,
   makeProposalKeyString,
@@ -11,7 +12,7 @@ import {
   contractProposalMap as contractProposalMapAtom,
   draftProposals as draftProposalsAtom,
   nextProposalRequestId as nextProposalRequestIdAtom,
-  onChainProposals
+  onChainProposals,
 } from 'atoms/proposal'
 import HelpTooltip from 'components/HelpTooltip'
 import { useThemeContext } from 'contexts/theme'
@@ -20,14 +21,20 @@ import { proposalMessages } from 'models/proposal/proposalSelectors'
 import { useRouter } from 'next/router'
 import { ChangeEvent, useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { useRecoilState, useRecoilValue, useResetRecoilState, useSetRecoilState } from 'recoil'
+import {
+  useRecoilState,
+  useRecoilTransaction_UNSTABLE,
+  useRecoilValue,
+  useResetRecoilState,
+  useSetRecoilState,
+} from 'recoil'
 import { isBankMsg, isBurnMsg, isMintMsg, isSendMsg } from 'selectors/message'
 import {
   labelForMessage,
   makeMintMessage,
   makeSpendMessage,
 } from 'util/messagehelpers'
-import { isProposal } from 'util/proposal'
+import { createProposalTransaction, isProposal } from 'util/proposal'
 import InputField, {
   InputFieldLabel,
   makeFieldErrorMessage,
@@ -38,6 +45,10 @@ import MintEditor from './MintEditor'
 import ProposalList from './ProposalList'
 import RawEditor from './RawEditor'
 import SpendEditor from './SpendEditor'
+import {
+  cosmWasmSigningClient as cosmWasmSigningClientAtom,
+  walletAddress as walletAddressAtom,
+} from 'atoms/cosm'
 
 export default function ProposalEditor({
   proposalId,
@@ -50,7 +61,7 @@ export default function ProposalEditor({
   proposalId: number
   loading?: boolean
   error?: string
-  onProposal: (proposal: Proposal) => void
+  onProposal?: (proposal: Proposal) => void
   contractAddress: string
   recipientAddress: string
 }) {
@@ -68,12 +79,34 @@ export default function ProposalEditor({
     formState: { errors },
   } = useForm()
   const router = useRouter()
-  const [contractProposalMap, setContractProposalMap] = useRecoilState(contractProposalMapAtom)
+  const [contractProposalMap, setContractProposalMap] = useRecoilState(
+    contractProposalMapAtom
+  )
   const draftProposals = useRecoilValue(draftProposalsAtom(contractAddress))
-  const [proposalMapItem, setProposalMapItem] = useRecoilState(draftProposalAtom({contractAddress, proposalId}))
-  const [nextProposalRequestId, setNextProposalRequestId] = useRecoilState(nextProposalRequestIdAtom)
-  const resetProposals = useResetRecoilState(proposalList({ contractAddress, startBefore: 0, requestId }))
-  const [nextDraftProposalId, setNextDraftProposalId] = useRecoilState(nextProposalRequestIdAtom)
+  const [proposalMapItem, setProposalMapItem] = useRecoilState(
+    draftProposalAtom({ contractAddress, proposalId })
+  )
+  const [nextProposalRequestId, setNextProposalRequestId] = useRecoilState(
+    nextProposalRequestIdAtom
+  )
+  const resetProposals = useResetRecoilState(
+    proposalList({ contractAddress, startBefore: 0, requestId })
+  )
+  const [nextDraftProposalId, setNextDraftProposalId] = useRecoilState(
+    nextProposalRequestIdAtom
+  )
+  const walletAddress = useRecoilValue(walletAddressAtom(undefined))
+  const signingClient = useRecoilValue(cosmWasmSigningClientAtom(undefined))
+  const createProposalFunction = useRecoilTransaction_UNSTABLE(
+    createProposalTransaction({
+      walletAddress,
+      signingClient,
+      contractAddress,
+      draftProposals
+    }),
+    [walletAddress, signingClient, contractAddress, draftProposals]
+  )
+
   const proposalsListRoute = `/dao/${contractAddress}/proposals`
 
   const proposal: Proposal =
@@ -83,7 +116,11 @@ export default function ProposalEditor({
 
   if (!proposalMapItem?.proposal) {
     // We're creating a new proposal, so bump the draft ID:
-    setNextDraftProposalId(nextDraftProposalId + 1)
+    setNextDraftProposalId(proposalId)
+  }
+
+  const createProposal = (proposal: Proposal) => {
+    createProposalFunction(proposalId, proposal)
   }
 
   const saveDraftProposal = (draftProposal: Proposal) => {
@@ -91,17 +128,20 @@ export default function ProposalEditor({
       ...contractProposalMap,
       [contractAddress]: {
         ...draftProposals,
-        [proposalId + '']: {...(proposalMapItem ?? draftProposalItem(draftProposal, proposalId)), proposal: draftProposal}
-      }
+        [proposalId + '']: {
+          ...(proposalMapItem ?? draftProposalItem(draftProposal, proposalId)),
+          proposal: draftProposal,
+        },
+      },
     })
   }
 
   const deleteDraftProposal = () => {
-    const updatedProposals = {...draftProposals}
+    const updatedProposals = { ...draftProposals }
     delete updatedProposals[proposalId + '']
     const updatedMap = {
       ...contractProposalMap,
-      [contractAddress]: updatedProposals
+      [contractAddress]: updatedProposals,
     }
     setContractProposalMap(updatedMap)
   }
@@ -155,7 +195,7 @@ export default function ProposalEditor({
     // the submit method gets called it will be.
     if (isProposal(proposal)) {
       if (isProposalValid(proposal)) {
-        await onProposal(proposal)
+        await createProposal(proposal)
         setNextProposalRequestId(nextProposalRequestId + 1)
         resetProposals()
         deleteDraftProposal()
@@ -177,8 +217,8 @@ export default function ProposalEditor({
       ...contractProposalMap,
       [contractAddress]: {
         ...draftProposals,
-        [proposalIdKey]: updatedProposalItem
-      }
+        [proposalIdKey]: updatedProposalItem,
+      },
     })
     // if (bumpNextId) {
     //   setNextProposalId(proposalId + 1)
@@ -216,6 +256,8 @@ export default function ProposalEditor({
             contractAddress={contractAddress}
             initialRecipientAddress={recipientAddress}
             proposalId={proposalId}
+            updateProposal={updateProposal}
+            msgIndex={messageIndex}
           />
         )
       } else if (isBurnMsg(msg.bank)) {

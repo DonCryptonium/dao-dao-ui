@@ -122,43 +122,6 @@ export const nextDraftProposalId = atom<number>({
   effects_UNSTABLE: [localStorageEffect<number>('nextDraftProposalId')],
 })
 
-// export const proposalItemEffect: (
-//   key: string
-// ) => AtomEffect<ProposalMapItem | undefined> =
-//   (proposalKey) =>
-//   ({ setSelf, onSet, getPromise }) => {
-//     getPromise(proposalMap).then((proposalItemMap) => {
-//       const existingItem = proposalItemMap[proposalKey]
-//       if (existingItem) {
-//         setSelf(existingItem)
-//       }
-//     })
-//   }
-
-// const proposalAtoms: {
-//   [key: string]: RecoilState<ProposalMapItem | undefined>
-// } = {}
-// export function makeProposalItemAtom(
-//   contractAddress: string,
-//   proposalId: number
-// ): RecoilState<ProposalMapItem | undefined> {
-//   const proposalKey = makeProposalKeyString({ contractAddress, proposalId })
-//   let proposalAtom = proposalAtoms[proposalKey]
-//     ? proposalAtoms[proposalKey]
-//     : undefined
-
-//   if (!proposalAtom) {
-//     proposalAtom = atom({
-//       key: proposalKey,
-//       default: undefined,
-//       effects_UNSTABLE: [proposalItemEffect(proposalKey)],
-//     })
-//     proposalAtoms[proposalKey] = proposalAtom
-//   }
-
-//   return proposalAtom
-// }
-
 export const onChainProposals = atomFamily<ProposalMapItem[], any>({
   key: 'ProposalListOnChain',
   default: selectorFamily({
@@ -206,7 +169,7 @@ export const proposals = atomFamily({
         requestId: number
       }) =>
       async ({ get }) => {
-        get(nextProposalRequestId)
+        // get(nextProposalRequestId)
         const draft = Object.values(get(draftProposals(contractAddress)) ?? {})
         draft.sort((a, b) => a.id > b.id ? -1 : b.id > a.id ? 1 : 0 )
         const onChain = get(onChainProposals({ contractAddress, startBefore, requestId }))

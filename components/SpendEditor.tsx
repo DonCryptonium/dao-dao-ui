@@ -1,4 +1,4 @@
-import { BankMsg } from '@dao-dao/types/contracts/cw3-dao'
+import { BankMsg, Proposal } from '@dao-dao/types/contracts/cw3-dao'
 import {
   MessageMapEntry,
   ProposalMessageType,
@@ -15,13 +15,17 @@ import { makeSpendMessage } from '../util/messagehelpers'
 export default function SpendEditor({
   contractAddress,
   proposalId,
+  msgIndex,
   initialRecipientAddress,
   spendMsg,
+  updateProposal
 }: {
   contractAddress: string,
   proposalId: number,
+  msgIndex: number,
   spendMsg?: BankMsg
   initialRecipientAddress: string
+  updateProposal: (proposal: Proposal) => void
 }) {
   const [validAddress, setValidAddress] = useState(
     isValidAddress(initialRecipientAddress)
