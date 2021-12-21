@@ -54,7 +54,7 @@ export default function ProposalEditor({
   contractAddress: string
   recipientAddress: string
 }) {
-  const requestId = useRecoilValue(nextDraftProposalId)
+  const requestId = useRecoilValue(nextProposalRequestIdAtom)
   const proposals = useRecoilValue(
     proposalList({ contractAddress, startBefore: 0, requestId })
   )
@@ -68,12 +68,12 @@ export default function ProposalEditor({
     formState: { errors },
   } = useForm()
   const router = useRouter()
-  const setNextProposalId = useSetRecoilState<number>(nextDraftProposalId)
   const [contractProposalMap, setContractProposalMap] = useRecoilState(contractProposalMapAtom)
   const draftProposals = useRecoilValue(draftProposalsAtom(contractAddress))
   const [proposalMapItem, setProposalMapItem] = useRecoilState(draftProposalAtom({contractAddress, proposalId}))
   const [nextProposalRequestId, setNextProposalRequestId] = useRecoilState(nextProposalRequestIdAtom)
   const resetProposals = useResetRecoilState(proposalList({ contractAddress, startBefore: 0, requestId }))
+  const [nextDraftProposalId, setNextDraftProposalId] = useRecoilState(nextProposalRequestIdAtom)
   const proposalsListRoute = `/dao/${contractAddress}/proposals`
 
   const proposal: Proposal =
@@ -81,8 +81,12 @@ export default function ProposalEditor({
       ? proposalMapItem.proposal
       : { ...EmptyProposal }
 
+  if (!proposalMapItem?.proposal) {
+    // We're creating a new proposal, so bump the draft ID:
+    setNextDraftProposalId(nextDraftProposalId + 1)
+  }
+
   const saveDraftProposal = (draftProposal: Proposal) => {
-    const bumpNextId = !draftProposals || !draftProposals[proposalId]
     setContractProposalMap({
       ...contractProposalMap,
       [contractAddress]: {
@@ -90,10 +94,6 @@ export default function ProposalEditor({
         [proposalId + '']: {...(proposalMapItem ?? draftProposalItem(draftProposal, proposalId)), proposal: draftProposal}
       }
     })
-    if (bumpNextId) {
-      setNextProposalId(proposalId + 1)
-    }
-    // router.push(proposalsListRoute)
   }
 
   const deleteDraftProposal = () => {

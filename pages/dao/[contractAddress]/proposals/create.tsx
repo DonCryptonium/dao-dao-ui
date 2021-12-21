@@ -9,20 +9,26 @@ import Link from 'next/link'
 import { Proposal } from '@dao-dao/types/contracts/cw3-dao'
 import { createProposal } from 'util/proposal'
 import {useRecoilState, useRecoilValue, useResetRecoilState} from 'recoil'
-import { nextDraftProposalId, onChainProposals } from 'atoms/proposal'
+import { draftProposal, draftProposalItem, nextDraftProposalId as nextDraftProposalIdAtom, onChainProposals } from 'atoms/proposal'
 import { cosmWasmSigningClient as cosmWasmSigningClientAtom, walletAddress as walletAddressAtom  } from 'atoms/cosm'
 
 const ProposalCreate: NextPage = () => {
   const router = useRouter()
   const contractAddress = router.query.contractAddress as string
-  const [nextProposalId, setNextProposalId] =
-    useRecoilState<number>(nextDraftProposalId)
+  const [nextDraftProposalId, setNextDraftProposalId] = useRecoilState<number>(nextDraftProposalIdAtom)
   const walletAddress = useRecoilValue(walletAddressAtom(undefined))
   const [transactionHash, setTransactionHash] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [proposalId, setProposalId] = useState<number>(-1)
   const signingClient = useRecoilValue(cosmWasmSigningClientAtom(undefined))
   const resetOnChainProposals = useResetRecoilState(onChainProposals(undefined))
+
+  if (proposalId < 0) {
+    const nextId = nextDraftProposalId + 1
+    setNextDraftProposalId(nextId)
+    setProposalId(nextId)
+  }
 
   const handleProposal = createProposal({
     contractAddress,
@@ -41,7 +47,7 @@ const ProposalCreate: NextPage = () => {
         <Link href={`/dao/${contractAddress}/proposals`}>Proposals</Link>
         <ProposalEditor
           onProposal={handleProposal}
-          proposalId={nextProposalId}
+          proposalId={proposalId}
           error={error}
           loading={loading}
           contractAddress={contractAddress}

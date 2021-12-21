@@ -25,7 +25,7 @@ function ProposalDetails({
   close: () => void
 }) {
   const proposalInfo = useRecoilValue<
-  ProposalMapItem
+  ProposalMapItem | undefined
 >(proposalItem({contractAddress, proposalId}))
 
   if (!proposalInfo?.proposal) {
