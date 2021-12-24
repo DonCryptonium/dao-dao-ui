@@ -2,12 +2,12 @@ import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import ProposalList from 'components/ProposalList'
 import { useRecoilValue } from 'recoil'
-import { nextDraftProposalId, nextProposalRequestId, proposals as proposalList } from 'atoms/proposal'
+import { nextDraftProposalId, proposalsRequestIdAtom, proposals as proposalList } from 'atoms/proposal'
 
 const DaoProposals: NextPage = () => {
   const router = useRouter()
   const contractAddress = router.query.contractAddress as string
-  const requestId = useRecoilValue(nextProposalRequestId)
+  const requestId = useRecoilValue(proposalsRequestIdAtom)
 
   const startBefore = 0;
   const proposals = useRecoilValue(proposalList({contractAddress, startBefore, requestId}))

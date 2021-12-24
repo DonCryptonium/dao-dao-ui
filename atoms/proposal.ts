@@ -89,8 +89,8 @@ const localStorageEffect: <T>(key: string) => AtomEffect<T> =
     })
   }
 
-export const nextProposalRequestId = atom<number>({
-  key: 'NextProposalRequestId',
+export const proposalsRequestIdAtom = atom<number>({
+  key: 'proposalsRequestIdAtom',
   default: 0
 })
 
@@ -169,7 +169,7 @@ export const proposals = atomFamily({
         requestId: number
       }) =>
       async ({ get }) => {
-        // get(nextProposalRequestId)
+        // get(proposalsRequestIdAtom)
         const draft = Object.values(get(draftProposals(contractAddress)) ?? {})
         draft.sort((a, b) => a.id > b.id ? -1 : b.id > a.id ? 1 : 0 )
         const onChain = get(onChainProposals({ contractAddress, startBefore, requestId }))
