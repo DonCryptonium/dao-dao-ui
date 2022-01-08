@@ -7,10 +7,14 @@ import { useProposal } from 'hooks/proposals'
 import ProposalDetails from 'components/ProposalDetails'
 import Link from 'next/link'
 import { cleanChainError } from 'util/cleanChainError'
+import { ArrowNarrowLeftIcon } from '@heroicons/react/outline'
+import { useRecoilValue } from 'recoil'
+import { daoSelector } from 'selectors/daos'
 
 const Proposal: NextPage = () => {
   let router = useRouter()
-  let { contractAddress } = router.query
+  let contractAddress = router.query.contractAddress as string
+  const daoInfo = useRecoilValue(daoSelector(contractAddress))
 
   const proposalId = router.query.proposalId as string
 
@@ -29,20 +33,29 @@ const Proposal: NextPage = () => {
 
   return (
     <WalletLoader loading={loading}>
-      <div className="flex flex-col w-full">
-        <div className="grid bg-base-100 place-items-center">
+      <div className="grid grid-cols-6">
+        <div className="w-full col-span-4 p-6">
+          <div className="text-md font-medium text-secondary-focus mb-6">
+            <ArrowNarrowLeftIcon className="inline w-5 h-5 mr-2 mb-1" />
+            <Link href="/dao/list">
+              <a className="mr-2">DAOs</a>
+            </Link>
+            /
+            <Link href={`/dao/${contractAddress}`}>
+              <a className="mx-2">{daoInfo.config.name}</a>
+            </Link>
+            /
+            <Link href={router.asPath}>
+              <a className="ml-2">Proposal #{proposalId}</a>
+            </Link>
+          </div>
+
           {!proposal ? (
             <div className="text-center m-8">
               No proposal with that ID found.
             </div>
           ) : (
-            <div className="mx-auto max-w-prose w-screen text-left">
-              <div className="justify-left flex">
-                <Link href={`/dao/${contractAddress}/proposals`}>
-                  <a className="link">{'< Back'}</a>
-                </Link>
-              </div>
-
+            <div>
               <ProposalDetails
                 proposal={proposal}
                 walletAddress={walletAddress}

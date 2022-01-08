@@ -39,11 +39,13 @@ function ProposalDetails({
 
   return (
     <>
-      <div className="mt-2 mb-8 flex justify-between items-center">
-        <h1 className="text-4xl font-bold inline align-middle">
+      <div className="mb-6 flex items-center">
+        <div className="text-2xl mr-2 mb-1">
+          <ProposalStatus status={proposal.status} />
+        </div>
+        <h1 className="text-2xl font-medium inline align-middle">
           {proposal.title}
         </h1>
-        <ProposalStatus status={proposal.status} />
       </div>
 
       <Markdown
