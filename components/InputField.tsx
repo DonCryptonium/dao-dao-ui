@@ -55,7 +55,9 @@ export function InputFieldLabel({
   const tooltipComponent = toolTip ? <HelpTooltip text={toolTip} /> : null
   return (
     <label className="label" htmlFor={fieldName}>
-      <span className="label-text font-bold">{label || fieldName}</span>
+      <span className="label-text text-secondary text-medium mt-3">
+        {label || fieldName}
+      </span>
       {errorComponent}
       {tooltipComponent}
     </label>
@@ -125,8 +127,8 @@ export default function InputField<
         type === 'checkbox'
           ? 'toggle'
           : errorText
-          ? `block box-border m-0 w-full rounded input input-bordered input-error`
-          : `block box-border m-0 w-full rounded input input-bordered`
+          ? `block box-border m-0 w-full rounded-lg input input-bordered input-error`
+          : `block box-border m-0 w-full rounded-lg input input-bordered`
       }
       defaultValue={defaultValue}
       defaultChecked={
