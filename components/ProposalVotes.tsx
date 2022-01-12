@@ -10,9 +10,11 @@ function ProposalVotes({ votes }: { votes: VoteInfo[] }) {
     <div className="overflow-x-auto">
       <table className="table w-full">
         <thead>
-          <th>Voter</th>
-          <th>Weight</th>
-          <th>Vote</th>
+          <tr>
+            <th>Voter</th>
+            <th>Weight</th>
+            <th>Vote</th>
+          </tr>
         </thead>
         <tbody>
           {!votes ||
