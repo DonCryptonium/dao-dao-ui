@@ -66,7 +66,7 @@ const Home: NextPage = () => {
         <div className="text-center">
           <h1 className="text-5xl font-medium mt-12">DAOs for everyone</h1>
           <p className="text-secondary max-w-lg my-5">
-            We provide tooling for creating and managing DAOs. Built with love on Juno, by DAO DAO, for DAOs.
+            We provide tooling for creating, deploying, managing, and joining DAOs. Built with love on Juno.
           </p>
           <div className="mb-12">
             <EnterAppButton />
@@ -80,12 +80,12 @@ const Home: NextPage = () => {
           </InfoCard>
           <InfoCard
             title="Propose and vote"
-            body="Create and vote on proposals that automate everything on chain." >
+            body="Create and vote on proposals without writing code." >
             <ScaleIcon />
           </InfoCard>
           <InfoCard
             title="Join the cosmoverse"
-            body="IBC compatable DAOs and can hold assets and interact with other chains." >
+            body="With the magic of IBC, your DAO can send and receive assets from other chains." >
             <StarIcon />
           </InfoCard>
         </div>
