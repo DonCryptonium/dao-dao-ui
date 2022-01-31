@@ -24,7 +24,7 @@ export const validateAddress = (v: string) =>
 
 export const validateUrl = (v: string) =>
   isValidUrl(v) ||
-  'Invalid URL link, must start with https and end with png/jpeg/gif.'
+  'Invalid URL link, must start with https and end with png/jpeg/gif/svg.'
 
 export const validateContractAddress = (v: string) =>
   isValidContractAddress(v) || 'Invalid contract address'
