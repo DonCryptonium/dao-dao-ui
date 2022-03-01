@@ -19,9 +19,15 @@ import SvgTwitter from 'components/icons/Twitter'
 import { Logo } from 'components/Logo'
 import ThemeToggle from 'components/ThemeToggle'
 
+import '../i18n/i18n'
+import {useTranslation} from "react-i18next";
+import {availableLanguages} from "../i18n/i18n";
+
+
 import { SITE_TITLE } from '../util/constants'
 
 function EnterAppButton({ small }: { small?: boolean }) {
+  const {t, i18n} = useTranslation()
   return (
     <Link href="/starred" passHref>
       <Button
@@ -33,7 +39,7 @@ function EnterAppButton({ small }: { small?: boolean }) {
           />
         }
       >
-        Enter the app
+        {t('index.enterAppButton')}
       </Button>
     </Link>
   )
@@ -62,6 +68,7 @@ function InfoCard({
 }
 
 const Home: NextPage = () => {
+  const {t, i18n} = useTranslation()
   return (
     <GradientWrapper>
       <nav className="border-b border-base-300/40 py-4 w-full px-6 bg-clip-padding backdrop-filter backdrop-blur-xl bg-opacity-40">
@@ -98,11 +105,10 @@ const Home: NextPage = () => {
         </div>
       </nav>
       <h1 className="text-7xl text-center font-medium mt-[33vh]">
-        DAOs for everyone.
+        {t('index.hero')}
       </h1>
       <p className="text-lg text-center max-w-lg mx-auto my-5 text-secondary px-2">
-        We provide tooling for creating, deploying, managing, and joining DAOs.
-        Built with love on Juno.
+        {t('index.subtitle')}
       </p>
       <div className="mb-12 mx-auto">
         <EnterAppButton />
@@ -110,20 +116,20 @@ const Home: NextPage = () => {
       <div className="mx-3">
         <div className="flex flex-row gap-3 flex-wrap justify-center">
           <InfoCard
-            title="Create DAOs"
-            body="Make DAOs with a visual interface. No command line required."
+            title={t('index.infoCard1.title')}
+            body={t('index.infoCard1.body')}
           >
             <PlusSmIcon />
           </InfoCard>
           <InfoCard
-            title="Propose and vote"
-            body="Create and vote on proposals without writing code."
+            title={t('index.infoCard2.title')}
+            body={t('index.infoCard2.body')}
           >
             <ScaleIcon />
           </InfoCard>
           <InfoCard
-            title="Launch tokens"
-            body="Launch your token. Share them across any chain that supports IBC."
+            title={t('index.infoCard3.title')}
+            body={t('index.infoCard3.body')}
           >
             <StarIcon />
           </InfoCard>
@@ -139,7 +145,7 @@ const Home: NextPage = () => {
               rel="noreferrer"
               className="transition hover:text-primary"
             >
-              Powered by Juno
+              {t('index.footer.poweredBy')}
               <ArrowNarrowRightIcon
                 className="w-6 h-4 inline mb-0.5 font-light"
                 style={{ transform: 'rotateY(0deg) rotate(-45deg)' }}
