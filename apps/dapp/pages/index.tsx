@@ -9,6 +9,7 @@ import {
   PlusSmIcon,
   StarIcon,
 } from '@heroicons/react/solid'
+import { useTranslation } from 'react-i18next'
 
 import { Button } from '@components'
 
@@ -20,14 +21,11 @@ import { Logo } from 'components/Logo'
 import ThemeToggle from 'components/ThemeToggle'
 
 import '../i18n/i18n'
-import {useTranslation} from "react-i18next";
-import {availableLanguages} from "../i18n/i18n";
-
-
+import { availableLanguages } from '../i18n/i18n'
 import { SITE_TITLE } from '../util/constants'
 
 function EnterAppButton({ small }: { small?: boolean }) {
-  const {t, i18n} = useTranslation()
+  const { t, i18n } = useTranslation()
   return (
     <Link href="/starred" passHref>
       <Button
@@ -68,7 +66,7 @@ function InfoCard({
 }
 
 const Home: NextPage = () => {
-  const {t, i18n} = useTranslation()
+  const { t, i18n } = useTranslation()
   return (
     <GradientWrapper>
       <nav className="border-b border-base-300/40 py-4 w-full px-6 bg-clip-padding backdrop-filter backdrop-blur-xl bg-opacity-40">
