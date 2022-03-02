@@ -20,8 +20,7 @@ import SvgTwitter from 'components/icons/Twitter'
 import { Logo } from 'components/Logo'
 import ThemeToggle from 'components/ThemeToggle'
 
-import '../i18n/i18n'
-import { availableLanguages } from '../i18n/i18n'
+import 'i18n'
 import { SITE_TITLE } from '../util/constants'
 
 function EnterAppButton({ small }: { small?: boolean }) {
