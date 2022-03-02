@@ -1,24 +1,35 @@
 {
-  "common": {
-    "index": {
-      "hero": "DAOs for everyone.",
-      "subtitle": "We provide tooling for creating, deploying, managing, and joining DAOs. Built with love on Juno.",
-      "enterAppButton": "Enter the app",
-      "infoCard1": {
-        "title": "Create DAOs",
-        "body": "Make DAOs with a visual interface. No command line required."
-      },
-      "infoCard2": {
-        "title": "Propose and vote",
-        "body": "Create and vote on proposals without writing code."
-      },
-      "infoCard3": {
-        "title": "Launch tokens",
-        "body": "Launch your token. Share them across any chain that supports IBC."
-      },
-      "footer": {
-        "poweredBy": "Powered by Juno"
-      }
+    "common": {
+        "index": {
+            "hero": "DAOs for everyone.",
+            "subtitle": "We provide tooling for creating, deploying, managing, and joining DAOs. Built with love on Juno.",
+            "enterAppButton": "Enter the app",
+            "infoCard1": {
+                "title": "Create DAOs",
+                "body": "Make DAOs with a visual interface. No command line required."
+            },
+            "infoCard2": {
+                "title": "Propose and vote",
+                "body": "Create and vote on proposals without writing code."
+            },
+            "infoCard3": {
+                "title": "Launch tokens",
+                "body": "Launch your token. Share them across any chain that supports IBC."
+            },
+            "footer": {
+                "poweredBy": "Powered by Juno"
+            }
+        },
+        "errors": {
+            "500": {
+                "title": "Internal server error",
+                "body": "An internal server error occured while trying to access"
+            },
+            "404": {
+                "title": "Page not found",
+                "body": "We couldn't find"
+            }
+        },
+        "connectWalletButton": "Connect wallet"
     }
-  }
 }

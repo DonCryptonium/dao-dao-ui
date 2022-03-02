@@ -26,7 +26,9 @@ import {
   convertDenomToHumanReadableDenom,
   convertMicroDenomToDenomWithDecimals,
 } from 'util/conversion'
+import { useTranslation } from 'react-i18next'
 
+import 'i18n'
 import SvgWallet from './icons/Wallet'
 
 const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
@@ -64,6 +66,7 @@ function DisconnectButton({ onClick }: { onClick: () => void }) {
 }
 
 function WalletConnect() {
+  const { t, i18n } = useTranslation()
   const [wallet, setWallet] = useRecoilState(connectedWalletAtom)
   const setInstallWarningVisible = useSetRecoilState(installWarningVisibleAtom)
   const setChainWarningVisible = useSetRecoilState(chainWarningVisibleAtom)
@@ -132,7 +135,7 @@ function WalletConnect() {
         onClick={handleConnect}
         iconBefore={<CashIcon className="inline w-4 h-4" />}
       >
-        Connect wallet
+        {t('connectWalletButton')}
       </Button>
     </div>
   )
