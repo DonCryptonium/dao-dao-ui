@@ -301,7 +301,7 @@ const CreateDao: NextPage = () => {
       tokenDecimals
     )
 
-    const msg: InstantiateMsg =
+    const msg =
       tokenMode == TokenMode.Create
         ? makeDaoInstantiateWithNewTokenMessage(
             data.name,
@@ -348,7 +348,13 @@ const CreateDao: NextPage = () => {
     }
 
     signingClient
-      .instantiate(walletAddress, DAO_CODE_ID, msg, data.name, 'auto')
+      .instantiate(
+        walletAddress,
+        Number(process.env.NEXT_PUBLIC_GOVERNANCE_CODE_ID),
+        msg,
+        data.name,
+        'auto'
+      )
       .then((response: InstantiateResult) => {
         setLoading(false)
         if (response.contractAddress.length > 0) {
@@ -368,6 +374,7 @@ const CreateDao: NextPage = () => {
         successNotify('New DAO Created')
       })
       .catch((err: any) => {
+        console.log('le error')
         setLoading(false)
         setError(err.message)
         console.log(err.message)

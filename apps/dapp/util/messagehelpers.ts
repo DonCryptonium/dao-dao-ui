@@ -215,7 +215,7 @@ export function makeDaoInstantiateWithExistingTokenMessage(
   proposal_deposit_amount: string | number,
   refund_failed_proposals: boolean,
   image_url?: string
-): DaoInstantiateMsg {
+) {
   const decimalThreshold = `${threshold}`
   const decimalQuorum = `${quorum}`
 
@@ -232,23 +232,55 @@ export function makeDaoInstantiateWithExistingTokenMessage(
       }
     : { absolute_percentage: { percentage: decimalThreshold } }
 
-  const msg: DaoInstantiateMsg = {
+  const msg = {
     name,
     description,
     image_url,
-    gov_token: {
-      use_existing_cw20: {
-        addr: tokenAddress,
-        label: `dao_${name}_staking_contract`,
-        stake_contract_code_id: STAKE_CODE_ID,
-        unstaking_duration,
-      },
+
+    voting_module_instantiate_info: {
+      code_id: Number(process.env.NEXT_PUBLIC_VOTEMOD_CODE_ID),
+      admin: { governance_contract: {} },
+      label: `DAO DAO (${name}) voting module`,
+      msg: btoa(
+        JSON.stringify({
+          token_info: {
+            existing: {
+              address: tokenAddress,
+              staking_contract: {
+                new: {
+                  staking_code_id: Number(
+                    process.env.NEXT_PUBLIC_STAKE_CW20_CODE_ID
+                  ),
+                  unstaking_duration,
+                },
+              },
+            },
+          },
+        })
+      ),
     },
-    threshold: thresholdObj,
-    max_voting_period,
-    proposal_deposit_amount,
-    refund_failed_proposals,
+
+    governance_modules_instantiate_info: [
+      {
+        code_id: Number(process.env.NEXT_PUBLIC_GOVMOD_CODE_ID),
+        admin: { governance_contract: {} },
+        label: `DAO DAO (${name}) single choice voting module`,
+        msg: btoa(
+          JSON.stringify({
+            threshold: thresholdObj,
+            max_voting_period,
+            only_members_execute: true,
+            deposit_info: {
+              token: 'voting_module_token',
+              deposit: proposal_deposit_amount,
+              refund_failed_proposals,
+            },
+          })
+        ),
+      },
+    ],
   }
+
   return msg
 }
 
@@ -268,7 +300,7 @@ export function makeDaoInstantiateWithNewTokenMessage(
   proposal_deposit_amount: string | number,
   refund_failed_proposals: boolean,
   image_url?: string
-): DaoInstantiateMsg {
+) {
   const decimalThreshold = `${threshold}`
   const decimalQuorum = `${quorum}`
   if (typeof proposal_deposit_amount === 'number') {
@@ -284,30 +316,57 @@ export function makeDaoInstantiateWithNewTokenMessage(
       }
     : { absolute_percentage: { percentage: decimalThreshold } }
 
-  const msg: DaoInstantiateMsg = {
+  const msg = {
     name,
     description,
     image_url,
-    gov_token: {
-      instantiate_new_cw20: {
-        cw20_code_id: CW20_CODE_ID,
-        label: tokenName,
-        msg: {
-          name: tokenName,
-          symbol: tokenSymbol,
-          decimals: 6,
-          initial_balances: owners,
-        },
-        stake_contract_code_id: STAKE_CODE_ID,
-        initial_dao_balance: dao_initial_balance,
-        unstaking_duration,
-      },
+
+    voting_module_instantiate_info: {
+      code_id: Number(process.env.NEXT_PUBLIC_VOTEMOD_CODE_ID),
+      admin: { governance_contract: {} },
+      label: `DAO DAO (${name}) voting module`,
+      msg: btoa(
+        JSON.stringify({
+          token_info: {
+            new: {
+              code_id: CW20_CODE_ID,
+              label: `DAO DAO (${name}) governance token`,
+
+              name: tokenName,
+              symbol: tokenSymbol,
+              decimals: 6,
+              initial_balances: owners,
+              staking_code_id: Number(
+                process.env.NEXT_PUBLIC_STAKE_CW20_CODE_ID
+              ),
+              unstaking_duration,
+            },
+          },
+        })
+      ),
     },
-    threshold: thresholdObj,
-    max_voting_period,
-    proposal_deposit_amount,
-    refund_failed_proposals,
+
+    governance_modules_instantiate_info: [
+      {
+        code_id: Number(process.env.NEXT_PUBLIC_GOVMOD_CODE_ID),
+        admin: { governance_contract: {} },
+        label: `DAO DAO (${name}) single choice voting module`,
+        msg: btoa(
+          JSON.stringify({
+            threshold: thresholdObj,
+            max_voting_period,
+            only_members_execute: true,
+            deposit_info: {
+              token: 'voting_module_token',
+              deposit: proposal_deposit_amount,
+              refund_failed_proposals,
+            },
+          })
+        ),
+      },
+    ],
   }
+
   return msg
 }
 
