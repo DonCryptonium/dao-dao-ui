@@ -23,6 +23,7 @@ import {
   StarButton,
   HeroContractHorizontalInfoSection,
 } from 'components/ContractView'
+import { CopyToClipboardAccent } from 'components/CopyToClipboard'
 import ErrorBoundary from 'components/ErrorBoundary'
 import Sidebar from 'components/Sidebar'
 import { StakingModal, StakingMode } from 'components/StakingModal'
@@ -175,7 +176,22 @@ function DaoHome() {
       </div>
       <Sidebar>
         <div className="col-start-5 col-span-2 p-6 min-h-screen h-full border-l border-base-300">
-          <h2 className="font-medium text-md my-3">Your shares</h2>
+          <div>
+            <h2 className="font-medium text-lg mb-4">Addresses</h2>
+            <ul className="list-none flex flex-col gap-2 text-secondary text-sm">
+              <li>
+                DAO <CopyToClipboardAccent value={contractAddress} />
+              </li>
+              <li>
+                Gov token <CopyToClipboardAccent value={daoInfo.gov_token} />
+              </li>
+              <li>
+                Staking{' '}
+                <CopyToClipboardAccent value={daoInfo.staking_contract} />
+              </li>
+            </ul>
+          </div>
+          <h2 className="font-medium text-md mt-5 mb-3">Your shares</h2>
           <ul className="list-none mt-3">
             <li>
               <BalanceCard
