@@ -280,7 +280,7 @@ export function ContractProposalsDispaly({
         <Link href={member ? proposalCreateLink : '#'} passHref>
           <a data-tip={tooltip}>
             <Button size="sm" disabled={!!tooltip || loading}>
-              {loading ? 'Loading..' : 'New proposal'}
+              {loading ? 'Loading...' : 'New proposal'}
             </Button>
           </a>
         </Link>
