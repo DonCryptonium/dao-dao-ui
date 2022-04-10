@@ -1,13 +1,14 @@
 import { selector, selectorFamily, atom } from 'recoil'
-import { GasPrice, StargateClient } from '@cosmjs/stargate'
-import {
-  CosmWasmClient,
-  SigningCosmWasmClient,
-} from '@cosmjs/cosmwasm-stargate'
+
+import { SigningCosmWasmClient } from '@cosmjs/cosmwasm-stargate'
+import { GasPrice } from '@cosmjs/stargate'
+
+import { cosmWasmClientRouter, stargateClientRouter } from 'util/clientRouter'
+import { NATIVE_DENOM, GAS_PRICE } from 'util/constants'
+
+import { localStorageEffect } from '../atoms/localStorageEffect'
 import { connectKeplrWithoutAlerts } from '../services/keplr'
 import { walletTokenBalanceUpdateCountAtom } from './treasury'
-import { localStorageEffect } from '../atoms/localStorageEffect'
-import { NATIVE_DENOM, GAS_PRICE } from 'util/constants'
 
 export type WalletConnection = 'keplr' | ''
 
@@ -18,14 +19,14 @@ const CHAIN_ID = process.env.NEXT_PUBLIC_CHAIN_ID
 export const stargateClient = selector({
   key: 'stargateClient',
   get: () => {
-    return StargateClient.connect(CHAIN_RPC_ENDPOINT)
+    return stargateClientRouter.connect(CHAIN_RPC_ENDPOINT)
   },
 })
 
 export const cosmWasmClient = selector({
   key: 'cosmWasmClient',
   get: () => {
-    return CosmWasmClient.connect(CHAIN_RPC_ENDPOINT)
+    return cosmWasmClientRouter.connect(CHAIN_RPC_ENDPOINT)
   },
 })
 
