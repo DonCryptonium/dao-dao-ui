@@ -19,8 +19,7 @@ import {
   UserIcon,
 } from '@heroicons/react/outline'
 
-import { Button } from '@components'
-
+import { Button } from '@components/Button'
 import { EmptyDaoCard } from '@components/EmptyDaoCard'
 import { pinnedDaosAtom } from 'atoms/pinned'
 import CodeIdSelect from 'components/CodeIdSelect'

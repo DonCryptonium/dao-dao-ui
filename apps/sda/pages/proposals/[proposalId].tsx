@@ -3,19 +3,23 @@ import { useRouter } from 'next/router'
 
 import { useRecoilValue } from 'recoil'
 
+import { LoadingScreen } from '@/components/LoadingScreen'
 import { daoSelector } from '@/selectors/daos'
 import { cw20TokenInfo } from '@/selectors/treasury'
+import { DAO_ADDRESS } from '@/util/constants'
 
 const Proposal: NextPage = () => {
   const router = useRouter()
-  const proposalKey = router.query.proposalId as string
-  const contractAddress = router.query.contractAddress as string
-  const daoInfo = useRecoilValue(daoSelector(contractAddress))
+
+  const proposalKey = Number(router.query.proposalId as string)
+
+  const daoInfo = useRecoilValue(daoSelector(DAO_ADDRESS))
   const govTokenInfo = useRecoilValue(cw20TokenInfo(daoInfo.gov_token))
 
+  if (!router.isReady) return <LoadingScreen />
+
   const proposalDetailsProps = {
-    contractAddress,
-    proposalId: Number(proposalKey),
+    proposalId: proposalKey,
   }
 
   return (
@@ -37,7 +41,7 @@ const Proposal: NextPage = () => {
           fromCosmosMsgProps={{
             govDecimals: govTokenInfo.decimals,
           }}
-          proposalId={Number(proposalKey)}
+          proposalId={proposalKey}
         /> */}
 
         <div className="px-6 pb-6 mt-6 lg:hidden">

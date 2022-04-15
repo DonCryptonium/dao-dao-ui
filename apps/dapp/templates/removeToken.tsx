@@ -2,8 +2,8 @@ import { useRecoilValue, waitForAll } from 'recoil'
 
 import { XIcon } from '@heroicons/react/outline'
 import { useFormContext } from 'react-hook-form'
-import { Button } from 'ui/Button'
 
+import { Button } from '@components/Button'
 import { AddressInput } from '@components/input/AddressInput'
 import { InputErrorMessage } from '@components/input/InputErrorMessage'
 import { InputLabel } from '@components/input/InputLabel'

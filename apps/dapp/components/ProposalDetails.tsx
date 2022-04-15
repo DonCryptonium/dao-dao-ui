@@ -9,9 +9,9 @@ import { CosmosMsgFor_Empty } from '@dao-dao/types/contracts/cw3-dao'
 import { EyeIcon, EyeOffIcon } from '@heroicons/react/outline'
 import { FormProvider, useForm } from 'react-hook-form'
 import toast from 'react-hot-toast'
-import { Button } from 'ui'
 
 import { proposalUpdateCountAtom, proposalsUpdated } from 'atoms/proposals'
+import { Button } from 'components/Button'
 import { MarkdownPreview } from 'components/MarkdownPreview'
 import {
   cosmWasmSigningClient,

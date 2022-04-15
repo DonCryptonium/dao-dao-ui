@@ -1,7 +1,6 @@
 import { ChevronRightIcon, XIcon } from '@heroicons/react/outline'
 
-import { Button } from '@components'
-
+import { Button } from 'components/Button'
 import SvgMessage from 'components/icons/Message'
 
 export function BetaWarningModal({ onAccept }: { onAccept: Function }) {

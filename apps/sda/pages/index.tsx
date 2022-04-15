@@ -1,79 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React from 'react'
 
-import type { GetStaticPaths, GetStaticProps, NextPage } from 'next'
-import { useRouter } from 'next/router'
+import type { NextPage } from 'next'
 
-import { useRecoilState, useRecoilValue } from 'recoil'
-
-import { PlusSmIcon } from '@heroicons/react/outline'
-import { Theme, useThemeContext } from 'ui'
-
-import { ErrorBoundary } from '@/components/ErrorBoundary'
-import { CHAIN_RPC_ENDPOINT, isMemberSelector } from '@/selectors/cosm'
-import {
-  daoSelector,
-  proposalCount,
-  tokenConfig,
-  totalStaked,
-} from '@/selectors/daos'
-import {
-  getBlockHeight,
-  walletAddress,
-  walletClaims,
-  walletStakedTokenBalance,
-  walletTokenBalance,
-  walletTokenBalanceLoading,
-} from '@/selectors/treasury'
-import { addToken } from '@/util/addToken'
-import { cosmWasmClientRouter } from '@/util/chainClientRouter'
-import { getFastAverageColor } from '@/util/colors'
 import { DAO_ADDRESS } from '@/util/constants'
-import { convertMicroDenomToDenomWithDecimals } from '@/util/conversion'
 
-const DaoHome = () => {
-  const router = useRouter()
-  const contractAddress = router.query.contractAddress as string
-
-  const daoInfo = useRecoilValue(daoSelector(contractAddress))
-  const tokenInfo = useRecoilValue(tokenConfig(daoInfo?.gov_token))
-  const stakedTotal = useRecoilValue(totalStaked(daoInfo?.staking_contract))
-  const proposalsTotal = useRecoilValue(proposalCount(contractAddress))
-  const { member } = useRecoilValue(isMemberSelector(contractAddress))
-
-  // Balances for the visitor
-  const govTokenBalance = useRecoilValue(walletTokenBalance(daoInfo?.gov_token))
-  const stakedGovTokenBalance = useRecoilValue(
-    walletStakedTokenBalance(daoInfo?.staking_contract)
-  )
-  const blockHeight = useRecoilValue(getBlockHeight)
-  const stuff = useRecoilValue(walletClaims(daoInfo.staking_contract))
-  // const initialClaimsAvaliable = stuff.claims
-  //   .filter((c) => claimAvaliable(c, blockHeight))
-  //   .reduce((p, n) => p + Number(n.amount), 0)
-
-  // // If a claim becomes avaliable while the page is open we need a way to update
-  // // the number of claims avaliable.
-  // const [claimsAvaliable, setClaimsAvaliable] = useState(initialClaimsAvaliable)e
-
-  const wallet = useRecoilValue(walletAddress)
-  const [tokenBalanceLoading, setTokenBalancesLoading] = useRecoilState(
-    walletTokenBalanceLoading(wallet)
-  )
-
-  const [showStaking, setShowStaking] = useState(false)
-
-  const stakedPercent = (
-    (100 * stakedTotal) /
-    Number(tokenInfo?.total_supply)
-  ).toLocaleString(undefined, { maximumSignificantDigits: 3 })
-
-  const shouldAddToken = router.query.add_token
-  useEffect(() => {
-    if (shouldAddToken) {
-      addToken(daoInfo.gov_token)
-    }
-  }, [shouldAddToken, daoInfo.gov_token])
-
+const Home: NextPage = () => {
   return (
     <div className="grid overflow-auto grid-cols-6 mb-3 min-h-screen">
       <div className="col-span-4 min-h-screen">
@@ -194,7 +125,7 @@ const DaoHome = () => {
             </li>
           ) : null} */}
         </ul>
-        {govTokenBalance?.amount ? (
+        {/* {govTokenBalance?.amount ? (
           <div className="p-6 mt-2 w-full bg-primary rounded-lg">
             <h3 className="mb-4 link-text">
               You have{' '}
@@ -229,7 +160,7 @@ const DaoHome = () => {
               </button>
             </div>
           </div>
-        ) : null}
+        ) : null} */}
         {/* <ClaimsPendingList
           incrementClaimsAvaliable={(n) => setClaimsAvaliable((a) => a + n)}
           stakingAddress={daoInfo.staking_contract}
@@ -250,75 +181,4 @@ const DaoHome = () => {
   )
 }
 
-interface StaticProps {
-  accentColor?: string
-}
-
-const DaoHomePage: NextPage<StaticProps> = ({ accentColor }) => {
-  const { isReady, isFallback } = useRouter()
-
-  const { setAccentColor, theme } = useThemeContext()
-
-  // Only set the accent color if we have enough contrast.
-  if (accentColor) {
-    const rgb = accentColor
-      .replace(/^rgba?\(|\s+|\)$/g, '')
-      .split(',')
-      .map(Number)
-    const brightness = (rgb[0] * 299 + rgb[1] * 587 + rgb[2] * 114) / 1000
-    if (
-      (theme === Theme.Dark && brightness < 60) ||
-      (theme === Theme.Light && brightness > 255 - 80)
-    ) {
-      accentColor = undefined
-    }
-  }
-
-  useEffect(() => {
-    if (!isReady || isFallback) return
-
-    setAccentColor(accentColor)
-  }, [accentColor, setAccentColor, isReady, isFallback])
-
-  // Trigger Suspense.
-  if (!isReady || isFallback) throw new Promise((_resolve) => {})
-
-  return (
-    <ErrorBoundary title="DAO Not Found">
-      <DaoHome />
-    </ErrorBoundary>
-  )
-}
-
-export default DaoHomePage
-
-// Fallback to loading screen if page has not yet been statically generated.
-export const getStaticPaths: GetStaticPaths = () => ({
-  paths: [],
-  fallback: true,
-})
-
-export const getStaticProps: GetStaticProps<StaticProps> = async ({
-  params: { contractAddress } = { contractAddress: undefined },
-}) => {
-  if (typeof contractAddress !== 'string' || !contractAddress) {
-    return { props: {} }
-  }
-
-  try {
-    const client = await cosmWasmClientRouter.connect(CHAIN_RPC_ENDPOINT)
-    const daoInfo = await client.queryContractSmart(contractAddress, {
-      get_config: {},
-    })
-    if (!daoInfo || !daoInfo.config || !daoInfo.config.image_url) {
-      return { props: {} }
-    }
-
-    const accentColor = await getFastAverageColor(daoInfo.config.image_url)
-    return { props: { accentColor } }
-  } catch (err) {
-    console.error(err)
-  }
-
-  return { props: {} }
-}
+export default Home

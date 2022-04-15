@@ -2,8 +2,8 @@ import { useRecoilValue } from 'recoil'
 
 import { PlusIcon, UserIcon, XIcon } from '@heroicons/react/outline'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-import { Button } from 'ui/Button'
 
+import { Button } from '@components/Button'
 import { FormCard } from '@components/FormCard'
 import { AddressInput } from '@components/input/AddressInput'
 import { InputErrorMessage } from '@components/input/InputErrorMessage'

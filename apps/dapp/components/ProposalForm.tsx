@@ -6,8 +6,8 @@ import { CosmosMsgFor_Empty } from '@dao-dao/types/contracts/cw3-dao'
 import { EyeIcon, EyeOffIcon, PlusIcon, XIcon } from '@heroicons/react/outline'
 import Tooltip from '@reach/tooltip'
 import { FormProvider, useFieldArray, useForm } from 'react-hook-form'
-import { Button } from 'ui'
 
+import { Button } from 'components/Button'
 import { walletAddress } from 'selectors/treasury'
 import {
   messageTemplates,

@@ -8,8 +8,8 @@ import {
   UseFormRegister,
   Validate,
 } from 'react-hook-form'
-import { Button } from 'ui'
 
+import { Button } from '@components/Button'
 import SvgAirplane from '@components/icons/Airplane'
 import { Modal } from '@components/Modal'
 

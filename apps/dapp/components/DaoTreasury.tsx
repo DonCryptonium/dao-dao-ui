@@ -6,8 +6,7 @@ import { useRecoilValue } from 'recoil'
 
 import { PlusSmIcon } from '@heroicons/react/outline'
 
-import { Button } from '@components'
-
+import { Button } from 'components/Button'
 import { daoSelector } from 'selectors/daos'
 import { addToken } from 'util/addToken'
 

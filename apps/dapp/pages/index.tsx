@@ -10,8 +10,7 @@ import {
   StarIcon,
 } from '@heroicons/react/solid'
 
-import { Button } from '@components'
-
+import { Button } from '@components/Button'
 import SvgArrowUpRight from '@components/icons/ArrowUpRight'
 import SvgDiscord from '@components/icons/Discord'
 import { GradientWrapper } from 'components/GradientWrapper'

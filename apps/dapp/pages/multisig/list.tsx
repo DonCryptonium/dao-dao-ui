@@ -18,8 +18,8 @@ import {
   SparklesIcon,
   UserIcon,
 } from '@heroicons/react/outline'
-import { Button } from 'ui'
 
+import { Button } from '@components/Button'
 import { EmptyMultisigCard } from '@components/EmptyMultisigCard'
 import { pinnedMultisigsAtom } from 'atoms/pinned'
 import CodeIdSelect from 'components/CodeIdSelect'

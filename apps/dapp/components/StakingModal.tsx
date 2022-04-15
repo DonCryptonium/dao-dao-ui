@@ -19,8 +19,8 @@ import {
 } from '@heroicons/react/outline'
 import Tooltip from '@reach/tooltip'
 import toast from 'react-hot-toast'
-import { Button } from 'ui'
 
+import { Button } from 'components/Button'
 import {
   cosmWasmSigningClient,
   walletAddress as walletAddressSelector,

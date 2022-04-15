@@ -13,7 +13,7 @@ import { ErrorBoundary } from '@/components/ErrorBoundary'
 import { LoadingScreen } from '@/components/LoadingScreen'
 import { Notifications } from '@/components/Notifications'
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+const InnerApp = ({ Component, pageProps }: AppProps) => {
   const [theme, setTheme] = useRecoilState(activeTheme)
   const [accentColor, setAccentColor] = useState<string | undefined>()
 
@@ -25,21 +25,27 @@ export default function MyApp({ Component, pageProps }: AppProps) {
   }, [theme])
 
   return (
-    <RecoilRoot>
-      <ThemeProvider
-        accentColor={accentColor}
-        setAccentColor={setAccentColor}
-        theme={theme}
-        updateTheme={setTheme}
-      >
-        <ErrorBoundary title="An unexpected error occurred.">
-          <Suspense fallback={<LoadingScreen />}>
-            <Component {...pageProps} />
-          </Suspense>
+    <ThemeProvider
+      accentColor={accentColor}
+      setAccentColor={setAccentColor}
+      theme={theme}
+      updateTheme={setTheme}
+    >
+      <ErrorBoundary title="An unexpected error occurred.">
+        <Suspense fallback={<LoadingScreen />}>
+          <Component {...pageProps} />
+        </Suspense>
+      </ErrorBoundary>
 
-          <Notifications />
-        </ErrorBoundary>
-      </ThemeProvider>
-    </RecoilRoot>
+      <Notifications />
+    </ThemeProvider>
   )
 }
+
+const MyApp = (props: AppProps) => (
+  <RecoilRoot>
+    <InnerApp {...props} />
+  </RecoilRoot>
+)
+
+export default MyApp

@@ -9,8 +9,7 @@ import { StarIcon as StarSolid } from '@heroicons/react/solid'
 import Tooltip from '@reach/tooltip'
 import { useThemeContext } from 'ui'
 
-import { Button } from '@components'
-
+import { Button } from 'components/Button'
 import { contractInstantiateTime } from 'selectors/contracts'
 import { isMemberSelector } from 'selectors/cosm'
 import {

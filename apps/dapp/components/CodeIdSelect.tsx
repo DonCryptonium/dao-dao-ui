@@ -1,6 +1,6 @@
 import { ChevronDownIcon } from '@heroicons/react/outline'
 
-import { Button } from '@components'
+import { Button } from 'components/Button'
 
 export interface ContractVersion {
   name: string

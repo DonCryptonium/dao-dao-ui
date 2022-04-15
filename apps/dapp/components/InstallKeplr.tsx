@@ -1,5 +1,6 @@
 import { ChevronRightIcon, XIcon } from '@heroicons/react/outline'
-import { Button } from 'ui/Button'
+
+import { Button } from 'components/Button'
 
 import { Modal } from './Modal'
 

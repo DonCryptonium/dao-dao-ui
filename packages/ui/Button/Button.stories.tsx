@@ -19,8 +19,7 @@ const Template: ComponentStory<typeof Button> = (args) => <Button {...args} />
 export const Primary = Template.bind({})
 Primary.args = {
   variant: 'primary',
-  size: 'md',
-  full: false,
+  size: 'lg',
   disabled: false,
   children: 'Connect wallet',
 }

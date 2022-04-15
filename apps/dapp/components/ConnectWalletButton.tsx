@@ -5,8 +5,7 @@ import { useRecoilValue, useRecoilState, useSetRecoilState } from 'recoil'
 import { CheckCircleIcon, LogoutIcon } from '@heroicons/react/outline'
 import Tooltip from '@reach/tooltip'
 
-import { Button } from '@components'
-
+import { Button } from 'components/Button'
 import {
   connectedWalletAtom,
   walletAddress as walletAddressSelector,
@@ -130,7 +129,6 @@ function WalletConnect() {
     <div className="my-4">
       <Button
         className="py-4 w-full hover:outline-brand hover:outline"
-        full
         onClick={handleConnect}
       >
         <SvgWallet fill="currentColor" height="20px" width="20px" />

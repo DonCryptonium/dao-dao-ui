@@ -19,17 +19,18 @@ import { cw20TokenInfo } from 'selectors/treasury'
 import { cleanChainError } from 'util/cleanChainError'
 import { expirationExpired } from 'util/expiration'
 
+import { DAO_ADDRESS } from '@/util/constants'
+
 const ProposalCreate: NextPage = () => {
   const router: NextRouter = useRouter()
-  const contractAddress = router.query.contractAddress as string
-  const daoInfo = useRecoilValue(daoSelector(contractAddress))
+  const daoInfo = useRecoilValue(daoSelector(DAO_ADDRESS))
   const tokenInfo = useRecoilValue(cw20TokenInfo(daoInfo.gov_token))
 
   const signingClient = useRecoilValue(cosmWasmSigningClient)
   const walletAddress = useRecoilValue(walletAddressSelector)
 
   const setProposalsCreated = useSetRecoilState(
-    proposalsCreatedAtom(contractAddress)
+    proposalsCreatedAtom(DAO_ADDRESS)
   )
 
   const [proposalLoading, setProposalLoading] = useState(false)
@@ -49,7 +50,7 @@ const ProposalCreate: NextPage = () => {
           {
             allowance: {
               owner: walletAddress,
-              spender: contractAddress,
+              spender: DAO_ADDRESS,
             },
           }
         )
@@ -65,7 +66,7 @@ const ProposalCreate: NextPage = () => {
             {
               increase_allowance: {
                 amount: daoInfo.config.proposal_deposit,
-                spender: contractAddress,
+                spender: DAO_ADDRESS,
               },
             },
             'auto'
@@ -84,7 +85,7 @@ const ProposalCreate: NextPage = () => {
     await signingClient
       ?.execute(
         walletAddress,
-        contractAddress,
+        DAO_ADDRESS,
         {
           propose: {
             title: d.title,
@@ -109,7 +110,7 @@ const ProposalCreate: NextPage = () => {
 
         setProposalsCreated((n) => n + 1)
 
-        router.push(`/dao/${contractAddress}/proposals/${proposalId}`)
+        router.push(`/proposals/${proposalId}`)
       })
       .finally(() => setProposalLoading(false))
   }
