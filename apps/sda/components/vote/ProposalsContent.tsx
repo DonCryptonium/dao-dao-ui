@@ -1,13 +1,11 @@
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import clsx from 'clsx'
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import { useRecoilValue, constSelector } from 'recoil'
 
 import { Status } from '@dao-dao/state/clients/cw-proposal-single'
 import { proposalModulesSelector } from '@dao-dao/state/recoil/selectors/clients/cw-core'
-import { listProposalsSelector } from '@dao-dao/state/recoil/selectors/clients/cw-proposal-single'
+import { listProposalsSelector, reverseProposalsSelector } from '@dao-dao/state/recoil/selectors/clients/cw-proposal-single'
 
-import { ProposalItem } from './ProposalItem'
+import ProposalList from './ProposalList'
 import { DAO_ADDRESS } from '@/util'
 
 export const ProposalsContent = () => {
@@ -15,11 +13,14 @@ export const ProposalsContent = () => {
     proposalModulesSelector({ contractAddress: DAO_ADDRESS, params: [{}] })
   )?.[0]
 
+  const [startBefore, setStartBefore] = useState<number | undefined>(undefined)
+  const limit = 30
+
   const allProposalResponses = useRecoilValue(
     proposalModuleAddress
-      ? listProposalsSelector({
+      ? reverseProposalsSelector({
           contractAddress: proposalModuleAddress,
-          params: [{}],
+        params: [{limit, startBefore}],
         })
       : constSelector(undefined)
   )?.proposals
@@ -38,6 +39,8 @@ export const ProposalsContent = () => {
       .reverse()
   }, [allProposalResponses])
 
+
+
   return (
     <div>
       {/* Only display open/none open if there are proposals. If there are
@@ -45,42 +48,18 @@ export const ProposalsContent = () => {
        * the bottom of the page.
        */}
       {!!allProposalResponses?.length && (
-        <>
-          <h2 className="flex gap-2 items-center mb-4 caption-text">
-            <ChevronDownIcon
-              className={clsx('w-4 h-4', {
-                '-rotate-90': openProposalResponses.length === 0,
-              })}
-            />{' '}
-            {openProposalResponses.length === 0 ? 'None open' : 'Open'}
-          </h2>
-
-          {openProposalResponses.length > 0 && (
-            <div className="mb-8 space-y-1">
-              {openProposalResponses.map((response) => (
-                <ProposalItem key={response.id} proposalResponse={response} />
-              ))}
-            </div>
-          )}
-        </>
+        <ProposalList
+          noneLabel="None open"
+          proposals={openProposalResponses}
+          statusLabel="Open"
+        />
       )}
 
-      <h2 className="flex gap-2 items-center caption-text">
-        <ChevronDownIcon
-          className={clsx('w-4 h-4', {
-            '-rotate-90': historyProposalResponses.length === 0,
-          })}
-        />{' '}
-        {historyProposalResponses.length === 0 ? 'No history' : 'History'}
-      </h2>
-
-      {historyProposalResponses.length > 0 && (
-        <div className="mt-4 space-y-1">
-          {historyProposalResponses.map((response) => (
-            <ProposalItem key={response.id} proposalResponse={response} />
-          ))}
-        </div>
-      )}
+      <ProposalList
+        noneLabel="No history"
+        proposals={historyProposalResponses}
+        statusLabel="History"
+      />
     </div>
   )
 }
