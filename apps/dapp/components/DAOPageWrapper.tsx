@@ -7,13 +7,14 @@ import {
   useContext,
 } from 'react'
 
-import { VotingModuleType } from '@dao-dao/utils'
+import { ProposalModuleType, VotingModuleType } from '@dao-dao/utils'
 
 import { DAONotFound } from './dao/NotFound'
 
 interface DAOInfo {
   coreAddress: string
   votingModuleType: VotingModuleType
+  proposalModuleType: ProposalModuleType
   // cw4-voting
   cw4GroupAddress: string | null
   // cw20-staked-balance-voting
@@ -26,6 +27,7 @@ interface DAOInfo {
 const DefaultDAOInfo: DAOInfo = {
   coreAddress: '',
   votingModuleType: VotingModuleType.Cw4Voting,
+  proposalModuleType: ProposalModuleType.CwProposalSingle,
   cw4GroupAddress: '',
   governanceTokenAddress: '',
   stakingContractAddress: '',
