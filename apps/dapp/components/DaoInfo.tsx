@@ -6,6 +6,7 @@ import { matchAndLoadCommon } from '@dao-dao/proposal-module-adapter'
 import { CopyToClipboard, Loader, Logo, SuspenseLoader } from '@dao-dao/ui'
 import { useVotingModuleAdapter } from '@dao-dao/voting-module-adapter'
 
+import { TooltipIcon } from '@dao-dao/ui'
 import { DaoTreasury } from './DaoTreasury'
 
 interface DaoInfoProps {
@@ -56,16 +57,33 @@ export const DaoInfo = ({ hideTreasury }: DaoInfoProps) => {
 const DaoInfoVotingProposalVotingConfigurations = () => {
   const { t } = useTranslation()
   const { coreAddress, proposalModules } = useDaoInfoContext()
+
   const components = useMemo(
     () =>
-      proposalModules.map((proposalModule) => ({
-        DaoInfoVotingConfiguration: matchAndLoadCommon(proposalModule, {
-          coreAddress,
-          Loader,
-          Logo,
-        }).components.DaoInfoVotingConfiguration,
-        proposalModule,
-      })),
+      proposalModules.map((proposalModule) => {
+        let proposalModuleLabel = `proposalModuleLabel.${
+          proposalModule.contractName.split(':').slice(-1)[0]
+        }`;
+
+        proposalModule.proposalModuleTranslated = t(proposalModuleLabel);
+
+        if (proposalModuleLabel === proposalModule.proposalModuleTranslated) {
+          proposalModule.showTT = true;
+          proposalModule.proposalModuleLabel = `Custom ${t('title.proposals')} Module`;
+        } else {
+          proposalModule.proposalModuleLabel = `${proposalModule.proposalModuleTranslated} ${t('title.proposals')}`;
+        }
+
+        return {
+          DaoInfoVotingConfiguration: matchAndLoadCommon(proposalModule, {
+            coreAddress,
+            Loader,
+            Logo,
+          }).components.DaoInfoVotingConfiguration,
+          proposalModule,
+        }
+      }
+    ),
     [coreAddress, proposalModules]
   )
 
@@ -76,34 +94,25 @@ const DaoInfoVotingProposalVotingConfigurations = () => {
     <>
       <ul className="flex flex-col gap-2 mt-3 text-xs list-none">
         {components.length > 1 ? (
-          <select
-            className="py-2 px-3 mb-2 text-body bg-transparent rounded-lg border border-default focus:outline-none focus:ring-1 ring-brand ring-offset-0 transition"
-            onChange={({ target: { value } }) =>
-              setSelectedIndex(Number(value))
-            }
-            value={selectedIndex}
-          >
-            {components.map(({ proposalModule }, index) => (
-              <option key={proposalModule.address} value={index}>
-                {t(
-                  `proposalModuleLabel.${
-                    proposalModule.contractName.split(':').slice(-1)[0]
-                  }`
-                )}{' '}
-                {t('title.proposals')}
-              </option>
-            ))}
-          </select>
+          <div className="flex gap-1 items-center">
+            <select
+              className="py-2 px-3 text-body bg-transparent rounded-lg border border-default focus:outline-none focus:ring-1 ring-brand ring-offset-0 transition"
+              onChange={({ target: { value } }) =>
+                setSelectedIndex(Number(value))
+              }
+              value={selectedIndex}
+            >
+              {components.map(({ proposalModule }, index) => (
+                <option key={proposalModule.address} value={index}>
+                  {proposalModule.proposalModuleLabel}{' - '}{proposalModule.contractName.split(':').slice(-1)[0]}
+                </option>
+              ))}
+            </select>
+            {proposalModule.showTT && <TooltipIcon label={`Using Custom Module: ${proposalModules[selectedIndex].contractName}`} />}
+          </div>
         ) : (
-          <p>
-            {t(
-              `proposalModuleLabel.${
-                proposalModules[selectedIndex].contractName
-                  .split(':')
-                  .slice(-1)[0]
-              }`
-            )}{' '}
-            {t('title.proposals')}
+          <p className="flex gap-1 items-center">
+            {proposalModules[selectedIndex].proposalModuleLabel}{proposalModules[selectedIndex].showTT && <TooltipIcon label={`Using Custom Module: ${proposalModules[selectedIndex].contractName}`} />}
           </p>
         )}
 
