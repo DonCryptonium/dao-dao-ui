@@ -1,7 +1,7 @@
 // GNU AFFERO GENERAL PUBLIC LICENSE Version 3. Copyright (C) 2022 DAO DAO Contributors.
 // See the "LICENSE" file in the root directory of this package for more copyright information.
 
-import { useWallet } from '@noahsaso/cosmodal'
+import { useWallet } from '@cosmos-wallet/react'
 import clsx from 'clsx'
 import { GetStaticProps, NextPage } from 'next'
 import { useEffect, useMemo, useState } from 'react'

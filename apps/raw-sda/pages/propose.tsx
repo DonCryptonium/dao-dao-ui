@@ -1,5 +1,5 @@
+import { useWallet } from '@cosmos-wallet/react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import { useWallet } from '@noahsaso/cosmodal'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'

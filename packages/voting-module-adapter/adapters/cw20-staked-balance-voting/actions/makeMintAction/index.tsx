@@ -1,4 +1,4 @@
-import { useWallet } from '@noahsaso/cosmodal'
+import { useWallet } from '@cosmos-wallet/react'
 import { useCallback, useMemo } from 'react'
 
 import {

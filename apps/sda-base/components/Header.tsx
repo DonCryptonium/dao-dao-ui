@@ -1,9 +1,6 @@
+import { CosmosWalletStatus } from '@cosmos-wallet/core'
+import { IWalletManagerContext, useWalletManager } from '@cosmos-wallet/react'
 import { HomeIcon, PlusIcon } from '@heroicons/react/solid'
-import {
-  IWalletManagerContext,
-  WalletConnectionStatus,
-  useWalletManager,
-} from '@noahsaso/cosmodal'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -184,11 +181,11 @@ export const Header = () => {
 
       <div
         className={clsx('hidden h-10 sm:block', {
-          'w-full': status === WalletConnectionStatus.Connected,
-          'justify-self-end': status !== WalletConnectionStatus.Connected,
+          'w-full': status === CosmosWalletStatus.Connected,
+          'justify-self-end': status !== CosmosWalletStatus.Connected,
         })}
       >
-        {status === WalletConnectionStatus.Connected ? (
+        {status === CosmosWalletStatus.Connected ? (
           <div className="flex flex-row flex-1 gap-3 justify-end items-center h-full">
             <div className="flex flex-col items-end text-right link-text">
               <span>{walletName}</span>

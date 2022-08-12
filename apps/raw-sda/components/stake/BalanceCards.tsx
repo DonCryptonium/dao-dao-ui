@@ -1,4 +1,4 @@
-import { useWalletManager } from '@noahsaso/cosmodal'
+import { useWalletManager } from '@cosmos-wallet/react'
 import { FunctionComponent } from 'react'
 import { useTranslation } from 'react-i18next'
 

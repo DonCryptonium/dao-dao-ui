@@ -1,7 +1,7 @@
 // GNU AFFERO GENERAL PUBLIC LICENSE Version 3. Copyright (C) 2022 DAO DAO Contributors.
 // See the "LICENSE" file in the root directory of this package for more copyright information.
 
-import { useWalletManager } from '@noahsaso/cosmodal'
+import { useWalletManager } from '@cosmos-wallet/react'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback, useEffect } from 'react'
 import { useRecoilState, useRecoilValue } from 'recoil'

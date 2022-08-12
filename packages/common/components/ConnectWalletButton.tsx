@@ -1,4 +1,4 @@
-import { useWalletManager } from '@noahsaso/cosmodal'
+import { useWalletManager } from '@cosmos-wallet/react'
 import { isMobile } from '@walletconnect/browser-utils'
 import clsx from 'clsx'
 import { FC } from 'react'

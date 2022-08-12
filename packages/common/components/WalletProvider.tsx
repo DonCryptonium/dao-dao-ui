@@ -2,10 +2,10 @@ import { GasPrice } from '@cosmjs/stargate'
 import {
   ChainInfoID,
   ChainInfoMap,
-  WalletManagerProvider,
-  WalletType,
-  useWallet,
-} from '@noahsaso/cosmodal'
+  KeplrWallet,
+  KeplrWalletConnectWallet,
+} from '@cosmos-wallet/core'
+import { WalletManagerProvider, useWallet } from '@cosmos-wallet/react'
 import { isMobile } from '@walletconnect/browser-utils'
 import { ComponentType, PropsWithChildren, ReactNode, useEffect } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -63,12 +63,10 @@ export const WalletProvider = ({
         textContent: '!primary-text',
       }}
       defaultChainId={CHAIN_ID}
-      enabledWalletTypes={[
-        WalletType.Keplr,
+      enabledWallets={[
+        KeplrWallet,
         // Only allow WalletConnect on mainnet.
-        ...(CHAIN_ID === ChainInfoID.Juno1
-          ? [WalletType.WalletConnectKeplr]
-          : []),
+        ...(CHAIN_ID === ChainInfoID.Juno1 ? [KeplrWalletConnectWallet] : []),
       ]}
       getSigningCosmWasmClientOptions={(chainInfo) => ({
         gasPrice: GasPrice.fromString(
@@ -83,7 +81,7 @@ export const WalletProvider = ({
       localStorageKey="connectedWalletId"
       preselectedWalletType={
         // If on a mobile device, default to WalletConnect.
-        isMobile() ? WalletType.WalletConnectKeplr : undefined
+        isMobile() ? KeplrWalletConnectWallet.id : undefined
       }
       renderLoader={() => <Loader size={64} />}
       walletConnectClientMeta={{

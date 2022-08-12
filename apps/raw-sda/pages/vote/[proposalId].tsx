@@ -1,4 +1,4 @@
-import { useWallet } from '@noahsaso/cosmodal'
+import { useWallet } from '@cosmos-wallet/react'
 import type { GetStaticPaths, NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { FC, useCallback, useMemo } from 'react'

@@ -15,8 +15,11 @@
   "license": "MIT",
   "dependencies": {
     "@cosmjs/cosmwasm-stargate": "0.28.10",
-    "@noahsaso/cosmodal": "0.6.1",
+    "@cosmos-wallet/react": "^0.8.2",
     "ajv": "^8.11.0",
     "react": "18.1.0"
+  },
+  "peerDependencies": {
+    "@cosmos-wallet/core": "^0.8.2"
   }
 }

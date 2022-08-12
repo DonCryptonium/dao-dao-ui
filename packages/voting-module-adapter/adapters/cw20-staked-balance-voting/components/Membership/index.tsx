@@ -1,5 +1,5 @@
 import { HandIcon, MinusSmIcon, PlusSmIcon } from '@heroicons/react/outline'
-import { useWalletManager } from '@noahsaso/cosmodal'
+import { useWalletManager } from '@cosmos-wallet/react'
 import clsx from 'clsx'
 import { ComponentType, FC, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'

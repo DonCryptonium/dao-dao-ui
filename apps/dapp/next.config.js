@@ -67,16 +67,29 @@ let config = {
   ],
   webpack: (config, options) => {
     if (options.isServer) {
-      config.externals = ['@noahsaso/cosmodal', ...config.externals]
+      config.externals = [
+        '@cosmos-wallet/core',
+        '@cosmos-wallet/react',
+        ...config.externals,
+      ]
     }
 
-    config.resolve.alias['@noahsaso/cosmodal'] = path.resolve(
+    config.resolve.alias['@cosmos-wallet/core'] = path.resolve(
       __dirname,
       '..',
       '..',
       'node_modules',
-      '@noahsaso',
-      'cosmodal'
+      '@cosmos-wallet',
+      'core'
+    )
+
+    config.resolve.alias['@cosmos-wallet/react'] = path.resolve(
+      __dirname,
+      '..',
+      '..',
+      'node_modules',
+      '@cosmos-wallet',
+      'react'
     )
 
     return config

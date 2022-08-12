@@ -1,10 +1,7 @@
+import { CosmosWalletStatus } from '@cosmos-wallet/core'
+import { IWalletManagerContext, useWalletManager } from '@cosmos-wallet/react'
 import { XIcon } from '@heroicons/react/outline'
 import { MenuIcon } from '@heroicons/react/solid'
-import {
-  IWalletManagerContext,
-  WalletConnectionStatus,
-  useWalletManager,
-} from '@noahsaso/cosmodal'
 import clsx from 'clsx'
 import { ComponentType, Dispatch, SVGProps, SetStateAction } from 'react'
 import { useTranslation } from 'react-i18next'
@@ -78,7 +75,7 @@ export const MobileNav = ({
           }
         )}
       >
-        {status === WalletConnectionStatus.Connected ? (
+        {status === CosmosWalletStatus.Connected ? (
           <div className="flex flex-row gap-3 justify-between items-center py-2 px-4 w-full rounded-md border border-default">
             <div className="flex flex-col link-text">
               <span>{walletName}</span>

@@ -1,5 +1,5 @@
+import { useWallet } from '@cosmos-wallet/react'
 import { InformationCircleIcon } from '@heroicons/react/outline'
-import { useWallet } from '@noahsaso/cosmodal'
 import type { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import { useCallback, useMemo, useState } from 'react'
@@ -75,7 +75,7 @@ const InnerProposalCreate = () => {
 
         {proposalModules.length > 1 ? (
           <select
-            className="py-2 px-3 mb-2 text-body bg-transparent rounded-lg border border-default focus:outline-none focus:ring-1 ring-brand ring-offset-0 transition"
+            className="py-2 px-3 mb-2 bg-transparent rounded-lg border focus:outline-none focus:ring-1 ring-offset-0 transition text-body border-default ring-brand"
             onChange={({ target: { value } }) =>
               setSelectedProposalModuleIndex(Number(value))
             }
@@ -102,7 +102,7 @@ const InnerProposalCreate = () => {
                 {t('title.proposals', { count: 1 })}
               </span>
 
-              <InformationCircleIcon className="shrink-0 w-4 h-4 text-disabled cursor-help" />
+              <InformationCircleIcon className="shrink-0 w-4 h-4 cursor-help text-disabled" />
             </InputThemedText>
           </Tooltip>
         )}

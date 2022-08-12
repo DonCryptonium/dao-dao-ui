@@ -1,5 +1,5 @@
+import { ChainInfoID } from '@cosmos-wallet/core'
 import { getKeplrFromWindow } from '@keplr-wallet/stores'
-import { ChainInfoID } from '@noahsaso/cosmodal'
 import { useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { useTranslation } from 'react-i18next'

@@ -1,4 +1,4 @@
-import { useWallet } from '@noahsaso/cosmodal'
+import { useWallet } from '@cosmos-wallet/react'
 import type { NextPage } from 'next'
 import React, { useState } from 'react'
 import { useTranslation } from 'react-i18next'
