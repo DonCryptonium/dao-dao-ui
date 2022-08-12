@@ -1,7 +1,7 @@
 import { useWalletManager } from '@cosmos-wallet/react'
 import { isMobile } from '@walletconnect/browser-utils'
 import clsx from 'clsx'
-import { FC } from 'react'
+import { FC, useEffect, useState } from 'react'
 
 import { useWalletBalance } from '@dao-dao/state'
 import {
@@ -24,11 +24,24 @@ export const ConnectWalletButton: FC<ConnectWalletButtonProps> = ({
   const {
     connect,
     disconnect,
-    isEmbeddedKeplrMobileWeb,
     connected,
     connectedWallet: { name, address } = {},
   } = useWalletManager()
   const { walletBalance = 0 } = useWalletBalance()
+
+  // Check if in Keplr Mobile built-in browser mode.
+  const [isEmbeddedKeplrMobileWeb, setIsEmbeddedKeplrMobileWeb] =
+    useState(false)
+  useEffect(() => {
+    import('@keplr-wallet/stores')
+      .then(({ getKeplrFromWindow }) => getKeplrFromWindow())
+      .then(
+        (keplr) =>
+          keplr &&
+          keplr.mode === 'mobile-web' &&
+          setIsEmbeddedKeplrMobileWeb(true)
+      )
+  }, [])
 
   if (mobile && isMobile() && CHAIN_ID !== 'juno-1') {
     return <NoMobileWallet />
@@ -39,6 +52,7 @@ export const ConnectWalletButton: FC<ConnectWalletButtonProps> = ({
       className={clsx('w-full', className)}
       connected={connected}
       onConnect={connect}
+      // Don't allow disconnecting if in Keplr Mobile web mode.
       onDisconnect={isEmbeddedKeplrMobileWeb ? undefined : disconnect}
       walletAddress={address ?? ''}
       walletBalance={walletBalance}
@@ -51,6 +65,7 @@ export const ConnectWalletButton: FC<ConnectWalletButtonProps> = ({
       className={className}
       connected={connected}
       onConnect={connect}
+      // Don't allow disconnecting if in Keplr Mobile web mode.
       onDisconnect={isEmbeddedKeplrMobileWeb ? undefined : disconnect}
       walletAddress={address ?? ''}
       walletBalance={walletBalance}

@@ -1547,10 +1547,10 @@
   resolved "https://registry.yarnpkg.com/@cosmjs/utils/-/utils-0.24.1.tgz#0adfefe63b7f17222bc2bc12f71296f35e7ad378"
   integrity sha512-VA3WFx1lMFb7esp9BqHWkDgMvHoA3D9w+uDRvWhVRpUpDc7RYHxMbWExASjz+gNblTCg556WJGzF64tXnf9tdQ==
 
-"@cosmos-wallet/core@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@cosmos-wallet/core/-/core-0.8.2.tgz#c2e7813b852df5e1c35a2db94d5640ffb14688fb"
-  integrity sha512-uWO6dD4a5uuBa7qg3qsVYfcpytBUFFANLMKxTJcgHlj158WChzH9nfvBLFQCKwhOAmixnxO9MtigQy8m0chV8g==
+"@cosmos-wallet/core@^0.9.3":
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/@cosmos-wallet/core/-/core-0.9.3.tgz#56d6e2a40139a81c798fbb2f9d5f17b3ef36492c"
+  integrity sha512-bmcoOn/CUPxQs6lGKjb5zMQdVqnriEPVNJSf4K/GrMitbLBt2oAnsgceTlyd7zsz0pnApneQX2vIuPpvGq/YGw==
   dependencies:
     "@babel/runtime" "^7.11.2"
     "@keplr-wallet/common" "^0.10.12"
@@ -1566,13 +1566,13 @@
     deepmerge "4.2.2"
     secretjs "0.17.5"
 
-"@cosmos-wallet/react@^0.8.2":
-  version "0.8.2"
-  resolved "https://registry.yarnpkg.com/@cosmos-wallet/react/-/react-0.8.2.tgz#7243a741a00d8a63b613d061a397f7ae82ecee4b"
-  integrity sha512-e6EW4DOfJYrVytsz+uVT4EK8zQJ07xeMD0SsxKFcDOD/A2BlnMoNcIMWZZWGHU4iOSXnhwSpAGXp2Zv6mU+9mg==
+"@cosmos-wallet/react@^0.9.3":
+  version "0.9.3"
+  resolved "https://registry.yarnpkg.com/@cosmos-wallet/react/-/react-0.9.3.tgz#55346fc3771a8a8281f535fd996d34541b4c024c"
+  integrity sha512-BvauQvy9t3B+Sp8m2uptQqWr/x1JdVr9jk1miCN1wPHPNbUCa7seprROS+yEVuuSzRLsnXvfPdLp1cfQr2Zzng==
   dependencies:
     "@babel/runtime" "^7.11.2"
-    "@cosmos-wallet/core" "^0.8.2"
+    "@cosmos-wallet/core" "^0.9.3"
     "@testing-library/react" "13.3.0"
     "@walletconnect/browser-utils" "1.7.8"
     qrcode.react "3.1.0"

@@ -79,7 +79,7 @@ export const WalletProvider = ({
         ),
       })}
       localStorageKey="connectedWalletId"
-      preselectedWalletType={
+      preselectedWalletId={
         // If on a mobile device, default to WalletConnect.
         isMobile() ? KeplrWalletConnectWallet.id : undefined
       }
